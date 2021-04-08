@@ -1,5 +1,5 @@
 # LiftDAO aka Lift.kitchen
-truffle run verify Treasury Boardroom GenesisVault wBTClfBTCLPTokenSharePool lfBTCLIFTLPTokenSharePool Oracle MockLinkOracle IdeaFund MockwBTC lfBTC LIFT CTRL HAIF HedgeFund DevFund --network rinkeby
+truffle run verify Treasury Boardroom GenesisVault wBTClfBTCLPTokenSharePool lfBTCLIFTLPTokenSharePool MockOracle MockLinkOracle IdeaFund MockwBTC lfBTC LIFT CTRL HAIF HedgeFund DevFund --network rinkeby
 
 At Launch
 - After Genesis - Migrate to Treasury
