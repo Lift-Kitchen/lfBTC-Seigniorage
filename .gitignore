@@ -1,0 +1,15 @@
+.idea/
+.env
+truffle-config.js
+node_modules/
+
+artifacts/
+cache/
+build/
+.DS_Store
+coverage/
+coverage.json
+
+*.log
+!deployments/*.log
+
