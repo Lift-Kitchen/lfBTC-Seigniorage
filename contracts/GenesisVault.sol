@@ -70,7 +70,7 @@ contract GenesisVault is TokenVault, ContractGuard {
     using SafeMath for uint256;
 
     /* ========== DATA STRUCTURES ========== */
-    uint public currentMultiplier = 5; // change to 2.5 after 1m total value staked in wbtc
+    uint public currentMultiplier = 5; // change to 2 after 1m total value staked in wbtc
     uint public weeklyEmissions = 20000;
     uint public variableReduction = 8;
     uint256 public totalMultipliedWBTCTokens = 0;
@@ -92,6 +92,7 @@ contract GenesisVault is TokenVault, ContractGuard {
     address public share; //LIFT
     address public ideaFund; //Where the LP goes
     address public lfbtcliftLPPool; // where the stakers get LP staked
+    uint256 public starttime;
 
     IUniswapV2Router02 public router;
 
@@ -109,7 +110,15 @@ contract GenesisVault is TokenVault, ContractGuard {
     // lfbtc + LIFT liqudity pool
     // router - Uniswap Router
     // IdeaFund - Idea Fund Address
-    constructor(address _theOracle, address _peg, address _share, address _stakingToken, address _lfbtcliftLPPool, address _router, address _ideaFund) {
+    constructor(address _theOracle, 
+                address _peg, 
+                address _share, 
+                address _stakingToken, 
+                address _lfbtcliftLPPool, 
+                address _router, 
+                address _ideaFund, 
+                uint256 _startTime) 
+    {
         theOracle = _theOracle;
         peg = _peg;
         share = _share;
@@ -117,6 +126,7 @@ contract GenesisVault is TokenVault, ContractGuard {
         ideaFund = _ideaFund;
         lfbtcliftLPPool = _lfbtcliftLPPool;
         router = IUniswapV2Router02(_router);
+        starttime = _startTime;
     }
 
     // MODIFIERS
@@ -135,6 +145,11 @@ contract GenesisVault is TokenVault, ContractGuard {
             terminated == false,
             'GenesisVault: is Terminated'
         );
+        _;
+    }
+
+    modifier started() {
+        require(block.timestamp > starttime, 'GenesisVault: is Not Started');
         _;
     }
 
@@ -256,6 +271,7 @@ contract GenesisVault is TokenVault, ContractGuard {
         override
         onlyOneBlock
         notTerminated
+        started
         updateStaking(msg.sender, amount)
     {
         require(amount > 0, 'GenesisVault: Cannot stake 0');

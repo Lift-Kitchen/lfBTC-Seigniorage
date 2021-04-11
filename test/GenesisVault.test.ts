@@ -9,6 +9,8 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-wit
 
 chai.use(solidity);
 
+const GENESIS_START_DATE = 1618074000;
+
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000';
 const ETH = utils.parseEther('1');
 
@@ -191,7 +193,8 @@ describe('GenesisVault', () => {
             mockwBTCToken.address,
             lfBTCLIFTLPTokenSharePool.address,
             uniswapRouter.address,
-            ideaFund.address
+            ideaFund.address,
+            GENESIS_START_DATE
         );
     });
 
