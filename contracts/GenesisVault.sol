@@ -60,7 +60,7 @@ abstract contract TokenVault is Operator {
     function stake(uint256 amount) public virtual {
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
-        IERC20(stakingToken).transferFrom(msg.sender, address(this), amount);
+        IERC20(stakingToken).SafeTransferFrom(msg.sender, address(this), amount);
     }
 }
 
