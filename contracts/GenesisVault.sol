@@ -60,7 +60,7 @@ abstract contract TokenVault is Operator {
     function stake(uint256 amount) public virtual {
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
-        IERC20(stakingToken).safeTransferFrom(msg.sender, address(this), amount);
+        IERC20(stakingToken).transferFrom(msg.sender, address(this), amount);
     }
 }
 
@@ -140,33 +140,12 @@ contract GenesisVault is TokenVault, ContractGuard {
         _;
     }
 
-    modifier notTerminated() {
-        require(
-            terminated == false,
-            'GenesisVault: is Terminated'
-        );
-        _;
-    }
-
     modifier started() {
         require(block.timestamp > starttime, 'GenesisVault: is Not Started');
         _;
     }
 
-    modifier checkMigration {
-        require(!migrated, 'GenesisVault: migrated');
-
-        _;
-    }
-
-    modifier onlyOnce {
-        require(!generated, 'Genesis has been executed before');
-        _;
-    }
-
     modifier updateStaking(address staker, uint256 amount) {
-        if (staker != address(0)) {
-
             //gives us a list of stakers to iterate on for the genesis moment.
             if(!(stakers[staker].isEntity)) {
                 stakersList.push(staker);
@@ -177,7 +156,6 @@ contract GenesisVault is TokenVault, ContractGuard {
             seat.multipliedNumWBTCTokens += amount.mul(currentMultiplier);
             seat.isEntity = true;
             stakers[staker] = seat;   
-        }
         _;
     }
 
@@ -202,13 +180,10 @@ contract GenesisVault is TokenVault, ContractGuard {
     }
 
     // mints required peg (lfbtc) token and creates the initial staking/peg LP (wbtc/lfbtc)
-    function beginGenesis() onlyOperator onlyOnce public {
+    function beginGenesis() onlyOperator public {
         // PHASE 1 - Create the stakingToken/Peg Pair
         //in lfBTC mint = totalStakedValue
         //create LP of wbtc and lfbtc to IdeaFund
-
-        //makes sure we arent allowing any more staking before starting genesis
-        require(terminated, 'You must terminate before executing genesis');
 
         //to many variables "stack to deep" compile error forced some of this sloppiness 
         
@@ -270,7 +245,6 @@ contract GenesisVault is TokenVault, ContractGuard {
         public
         override
         onlyOneBlock
-        notTerminated
         started
         updateStaking(msg.sender, amount)
     {
@@ -280,7 +254,7 @@ contract GenesisVault is TokenVault, ContractGuard {
     }
 
     // RESCUE Functions -- call after Genesis to migrate token owner/operator to Treasury
-    function migrate(address target) public onlyOperator checkOperator {
+    function migrate(address target) public onlyOperator {
         require(!migrated, 'GenesisVault: migrated');
 
         // lfbtc
