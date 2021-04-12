@@ -247,7 +247,6 @@ describe('GenesisVault', () => {
             });
 
             it('should getStakingTokenPrice', async () => {
-                const kBTCAmountToMint = ETH.mul(500);
                 const kwTCAmountToMint = ETH.mul(20);
 
                 await mockwBTCToken.connect(operator).mint(operator.address, kwTCAmountToMint);

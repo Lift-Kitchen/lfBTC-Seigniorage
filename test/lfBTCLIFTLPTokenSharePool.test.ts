@@ -6,10 +6,11 @@ import UniswapV2Factory from '@uniswap/v2-core/build/UniswapV2Factory.json';
 import UniswapV2Router from '@uniswap/v2-periphery/build/UniswapV2Router02.json';
 import { Provider } from '@ethersproject/providers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
-import IERC20 from '@openzeppelin/contracts/build/contracts/IERC20.json';
+import { advanceTimeAndBlock } from './shared/utilities';
 
 chai.use(solidity);
 
+const DAY = 86400;
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000';
 const ETH = utils.parseEther('1');
 
@@ -44,6 +45,7 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
     const { provider } = ethers;
     const startTime = 0;
     const period = 0;
+    const lockoutPeriod = 30;
 
     let lfBTCTokenFactory: ContractFactory;
     let liftTokenFactory: ContractFactory;
@@ -229,6 +231,120 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
                      .withArgs(addr1.address, amountToStake);
 
                 expect(await mockLPToken.balanceOf(lfBTCLIFTLPTokenSharePool.address)).to.be.eq(amountToStake);
+            });
+
+            it('should not allow withdrawing lpt of 0 amount', async () => {
+                await expect(lfBTCLIFTLPTokenSharePool.connect(addr1).withdraw(0))
+                    .to.be.revertedWith(
+                        "VM Exception while processing transaction: revert lfBTCLIFTLPTokenSharePool: Cannot withdraw 0"
+                    );
+            });
+
+            it('should not allow withdrawing more lpt than staked ', async () => {
+                const amountToStake = ETH.mul(10);
+
+                await lfBTCToken.mint(addr1.address, amountToStake);
+                await lfBTCToken.connect(addr1).approve(uniswapRouter.address, amountToStake);
+
+                await liftToken.mint(addr1.address, amountToStake);
+                await liftToken.connect(addr1).approve(uniswapRouter.address, amountToStake);
+
+                await mockLPToken.connect(operator).mint(addr1.address, amountToStake);
+                await mockLPToken.connect(addr1).approve(lfBTCLIFTLPTokenSharePool.address, amountToStake);
+
+                await lfBTCLIFTLPTokenSharePool.connect(addr1).stake(amountToStake);
+
+                await expect(lfBTCLIFTLPTokenSharePool.connect(addr1).withdraw(amountToStake.add(1)))
+                    .to.be.revertedWith(
+                        "VM Exception while processing transaction: revert lfBTCLIFTLPTokenSharePool: Cannot withdraw more than staked"
+                    );
+            });
+
+            it('should allow withdrawing lpt', async () => {
+                const amountToStake = ETH.mul(10);
+
+                await lfBTCToken.mint(addr1.address, amountToStake);
+                await lfBTCToken.connect(addr1).approve(uniswapRouter.address, amountToStake);
+
+                await liftToken.mint(addr1.address, amountToStake);
+                await liftToken.connect(addr1).approve(uniswapRouter.address, amountToStake);
+
+                await mockLPToken.connect(operator).mint(addr1.address, amountToStake);
+                await mockLPToken.connect(addr1).approve(lfBTCLIFTLPTokenSharePool.address, amountToStake);
+
+                await lfBTCLIFTLPTokenSharePool.connect(addr1).stake(amountToStake);
+
+                await expect(lfBTCLIFTLPTokenSharePool.connect(addr1).withdraw(amountToStake))
+                     .to.emit(lfBTCLIFTLPTokenSharePool, "Withdrawn")
+                     .withArgs(addr1.address, amountToStake);
+            });
+
+            it('should not allow withdrawing staked lpt on behalf of a staker during lockout', async () => {
+                const amountToStake = ETH.mul(10);
+
+                await lfBTCToken.mint(operator.address, amountToStake);
+                await lfBTCToken.approve(uniswapRouter.address, amountToStake);
+
+                await liftToken.mint(operator.address, amountToStake);
+                await liftToken.approve(uniswapRouter.address, amountToStake);
+
+                await mockLPToken.mint(operator.address, amountToStake);
+                await mockLPToken.approve(lfBTCLIFTLPTokenSharePool.address, amountToStake);
+
+                await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, true);
+
+                await expect(lfBTCLIFTLPTokenSharePool.connect(addr1).withdraw(amountToStake))
+                    .to.be.revertedWith(
+                        "VM Exception while processing transaction: revert lfBTCLiftLPTokenSharePool: still in lockout period"
+                    );
+            });
+
+            it('should return daysElapsed since staking', async () => {
+                const amountToStake = ETH.mul(10);
+
+                await lfBTCToken.mint(operator.address, amountToStake);
+                await lfBTCToken.approve(uniswapRouter.address, amountToStake);
+
+                await liftToken.mint(operator.address, amountToStake);
+                await liftToken.approve(uniswapRouter.address, amountToStake);
+
+                await mockLPToken.mint(operator.address, amountToStake);
+                await mockLPToken.approve(lfBTCLIFTLPTokenSharePool.address, amountToStake);
+
+                await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, true);
+
+                const daysToWait = 7;
+                await advanceTimeAndBlock(
+                    provider,
+                    BigNumber.from(DAY * daysToWait).toNumber()
+                  );
+                
+                const daysElapsed = await lfBTCLIFTLPTokenSharePool.connect(addr1).daysElapsed();
+                expect(daysElapsed).to.be.eq(daysToWait);
+            });
+
+            it('should allow withdrawing staked lpt on behalf of a staker after lockoutPeriod has passed', async () => {
+                const amountToStake = ETH.mul(10);
+
+                await lfBTCToken.mint(operator.address, amountToStake);
+                await lfBTCToken.approve(uniswapRouter.address, amountToStake);
+
+                await liftToken.mint(operator.address, amountToStake);
+                await liftToken.approve(uniswapRouter.address, amountToStake);
+
+                await mockLPToken.mint(operator.address, amountToStake);
+                await mockLPToken.approve(lfBTCLIFTLPTokenSharePool.address, amountToStake);
+
+                await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, true);
+
+                await advanceTimeAndBlock(
+                    provider,
+                    BigNumber.from(DAY * lockoutPeriod).toNumber()
+                  );
+
+                await expect(lfBTCLIFTLPTokenSharePool.connect(addr1).withdraw(amountToStake))
+                    .to.emit(lfBTCLIFTLPTokenSharePool, "Withdrawn")
+                    .withArgs(addr1.address, amountToStake);
             });
         });
     });

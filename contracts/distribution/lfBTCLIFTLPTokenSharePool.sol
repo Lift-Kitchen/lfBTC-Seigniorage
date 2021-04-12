@@ -118,7 +118,7 @@ contract lfBTCLIFTLPTokenSharePool is
         return Math.min(block.timestamp, periodFinish);
     }
 
-    function daysRemaining() external view returns (uint256) {
+    function daysElapsed() external view returns (uint256) {
         return ((block.timestamp - lockedOutDate[msg.sender]) / 60 / 60 / 24);
     }
 
@@ -170,8 +170,9 @@ contract lfBTCLIFTLPTokenSharePool is
         updateReward(msg.sender)
     {
         require(amount > 0, 'lfBTCLIFTLPTokenSharePool: Cannot withdraw 0');
+        require(amount <= super.balanceOf(msg.sender), 'lfBTCLIFTLPTokenSharePool: Cannot withdraw more than staked');
 
-        require(((block.timestamp - lockedOutDate[msg.sender]) / 60 / 60 / 24) > lockoutPeriod, 'lfBTCLiftLPTokenSharePool: still in lockout period');
+        require(((block.timestamp - lockedOutDate[msg.sender]) / 60 / 60 / 24) >= lockoutPeriod, 'lfBTCLiftLPTokenSharePool: still in lockout period');
         super.withdraw(amount);
         emit Withdrawn(msg.sender, amount);
     }
