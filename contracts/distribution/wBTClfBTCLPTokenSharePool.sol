@@ -124,7 +124,7 @@ contract wBTClfBTCLPTokenSharePool is
         return Math.min(block.timestamp, periodFinish);
     }
 
-    function daysRemaining() external view returns (uint256) {
+    function daysElapsed() external view returns (uint256) {
         return ((block.timestamp - lockedOutDate[msg.sender]) / 60 / 60 / 24);
     }
 
@@ -177,8 +177,9 @@ contract wBTClfBTCLPTokenSharePool is
         updateReward(msg.sender)
     {
         require(amount > 0, 'wBTClkBTCLPTokenSharePool: Cannot withdraw 0');
+        require(amount <= super.balanceOf(msg.sender), 'wBTClkBTCLPTokenSharePool: Cannot withdraw more than staked');
         
-        require(((lockedOutDate[msg.sender] - block.timestamp) / 60 / 60 / 24) > lockoutPeriod, 'lfBTCLiftLPTokenSharePool: still in lockout period');
+        require(((lockedOutDate[msg.sender] - block.timestamp) / 60 / 60 / 24) >= lockoutPeriod, 'lfBTCLiftLPTokenSharePool: still in lockout period');
         super.withdraw(amount);
         emit Withdrawn(msg.sender, amount);
     }

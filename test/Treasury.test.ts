@@ -273,7 +273,7 @@ describe('Treasury', () => {
                 await liftToken.transferOperator(treasury.address);
                 await ctrlToken.transferOperator(treasury.address);
                 await boardroom.transferOperator(treasury.address);
-                
+
                 await expect(treasury.allocateSeigniorage())
                     .to.emit(treasury, "DevFundFunded")
                     .to.emit(treasury, "IdeaFundFunded")
