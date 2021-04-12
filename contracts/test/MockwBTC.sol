@@ -18,6 +18,7 @@ contract MockwBTC is ERC20Burnable, Operator {
      */
     constructor() ERC20('wBTC', 'wBTC') {
         _mint(msg.sender, MINT_AMOUNT);
+        _setupDecimals(8);
     }
 
     /**
