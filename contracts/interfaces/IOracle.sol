@@ -2,6 +2,7 @@
 pragma solidity >=0.6.0;
 
 interface IOracle {
+    function initialize() external;
     function update() external;
     function priceOf(address token) external view returns (uint256 priceOfToken);
     function wbtcPriceOne() external view returns (uint256 priceOfwBTC);

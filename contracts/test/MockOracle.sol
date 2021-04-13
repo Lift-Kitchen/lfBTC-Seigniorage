@@ -51,7 +51,7 @@ contract MockOracle is IOracle {
         startTime = _startTime;
     }
 
-    function initialize() external {
+    function initialize() external override {
     }
 
     function setPrice(uint256 _price) public {

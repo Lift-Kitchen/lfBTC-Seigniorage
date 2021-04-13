@@ -26,6 +26,7 @@ module.exports = async (deployer, network, accounts) => {
    const ideafund = await IdeaFund.deployed();
    const hedgefund = await HedgeFund.deployed();
 
+   const oracle = await Oracle.deployed();
    const treasury = await Treasury.deployed();
    const boardroom = await Boardroom.deployed();
    const genesisvault = await GenesisVault.deployed();
@@ -33,7 +34,7 @@ module.exports = async (deployer, network, accounts) => {
    const sharepool = await lfbtcliftLPPool.deployed();
 
 
-   for await (const contract of [ peg, share ]) {
+   for await (const contract of [ peg, share, oracle ]) {
      await contract.transferOperator(genesisvault.address);
      await contract.transferOwnership(genesisvault.address);
    }

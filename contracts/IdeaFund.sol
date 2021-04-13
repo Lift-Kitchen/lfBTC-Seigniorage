@@ -74,8 +74,9 @@ contract IdeaFund is Operator, ContractGuard {
     // the second divide by 2 leaves funds in the idea fund to also stablize and invest should all owners of control decide to sell
     function getControlPrice() public view returns(uint256) {
 
-        //calculate value        
-        return _haifSupply.mul(IOracle(theOracle).priceOf(hedge)).div(2) + IERC20(wbtc).balanceOf(address(this)).mul(IOracle(theOracle).wbtcPriceOne()).div(variableReduction).div(IERC20(control).totalSupply());
+        //calculate value   
+        //TODO Math update based on 10 digits     
+        return _haifSupply.mul(IOracle(theOracle).priceOf(hedge)).div(2) + IERC20(wbtc).balanceOf(address(this)).mul(1e10).mul(IOracle(theOracle).wbtcPriceOne()).div(variableReduction).div(IERC20(control).totalSupply());
     }
 
     /* ==== CTRL BUY and SELL ====== */
@@ -119,7 +120,7 @@ contract IdeaFund is Operator, ContractGuard {
     {
         require(amount > 0, 'Idea Fund: cannot redeem CTRL with zero amount');
         require(
-            IERC20(wbtc).balanceOf(address(this)).mul(IOracle(theOracle).wbtcPriceOne()) >= amount.mul(getControlPrice()),
+            IERC20(wbtc).balanceOf(address(this)).mul(1e10).mul(IOracle(theOracle).wbtcPriceOne()) >= amount.mul(getControlPrice()),
             'Idea Fund: Treasury does not currently hold enough wBTC to purchase'
         );
 
@@ -128,7 +129,7 @@ contract IdeaFund is Operator, ContractGuard {
 
         ITreasury(treasury).burnControlForIdeaFund(msg.sender, amount);
         
-        IERC20(wbtc).safeTransfer(msg.sender, amount.mul(getControlPrice()).div(IOracle(theOracle).wbtcPriceOne()));
+        IERC20(wbtc).safeTransfer(msg.sender, amount.mul(getControlPrice()).div(IOracle(theOracle).wbtcPriceOne()).div(1e10));
         
         emit RedeemedCTRL(msg.sender, amount);
     }

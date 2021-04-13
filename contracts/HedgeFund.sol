@@ -135,8 +135,9 @@ contract HedgeFund is Operator, ContractGuard {
             IERC20(tokentoDeposit).transferFrom(msg.sender, address(this), amount);
             uint256 mintedHedge = 0;
 
-            if(tokentoDeposit == storedvalueToken ||
-                tokentoDeposit == peg ||
+            if(tokentoDeposit == storedvalueToken) {
+                mintedHedge = amount.mul(1e10).mul(IOracle(theOracle).priceOf(tokentoDeposit)).div(hedgePrice());
+            } else if(tokentoDeposit == peg ||
                 tokentoDeposit == share ||
                 tokentoDeposit == control) {
                 mintedHedge = amount.mul(IOracle(theOracle).priceOf(tokentoDeposit)).div(hedgePrice());
@@ -147,8 +148,11 @@ contract HedgeFund is Operator, ContractGuard {
 
                 (token0Supply, token1Supply, ) = pair.getReserves();
 
+                //pair.token0().decimals()
+                //pair.token1().decimals()
                 // this should arrive at the value of the pairing...
                 // when testing this in rinkeby we need to see if it discounts the lfBTC price to 0 and only returns tlv of wbtc
+                // TODO Need to check decimals on token to determine if a multiplier is needed.
                 uint256 tokenPrice = (uint256(token0Supply).mul(pair.price0CumulativeLast()) + uint256(token1Supply).mul(pair.price1CumulativeLast())).div(pair.totalSupply());
 
                 mintedHedge = amount.mul(tokenPrice).div(hedgePrice());

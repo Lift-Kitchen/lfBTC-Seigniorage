@@ -139,7 +139,6 @@ contract Oracle is Epoch {
         return uint256(linkOracle.latestAnswer() * 1e10);
     }
 
-    // no idea if this does what I want...
     function priceOf(address token) external view returns (uint256 price) {
          if (token == peg) {
             return pricePegAverage;
@@ -149,6 +148,8 @@ contract Oracle is Epoch {
             IIdeaFund(token).controlPrice();
         } else if(token == hedge) {
             IHedgeFund(token).hedgePrice();
+        } else if(token == staking) {
+            return uint256(linkOracle.latestAnswer() * 1e10);
         }
     }
 

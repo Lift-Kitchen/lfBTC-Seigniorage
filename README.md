@@ -1,6 +1,19 @@
 # LiftDAO aka Lift.kitchen
 truffle run verify Treasury Boardroom GenesisVault wBTClfBTCLPTokenSharePool lfBTCLIFTLPTokenSharePool MockOracle MockLinkOracle IdeaFund MockwBTC lfBTC LIFT CTRL HAIF HedgeFund DevFund --network rinkeby
 
+HedgeFund needs to review
+- decimal place math with the wbtc pair (need to add some multipliers)
+- review the buy and sell function dealing with wbtc.
+- look at pair decimal function for wbtc/kbtc pair (math errors!)
+- HUGE genesis update to improve GAS usage for the mint/approve/stake functions (must test)
+
+
+
+- add the liquidity in mainnet 
+- oracle cant initialize until after genesis
+- run the initialize function on the oracle
+
+
 At Launch
 - After Genesis - Migrate to Treasury
 - VALIDATE ORACLE BEFORE Moving UniTokens from IdeaFund to HedgeFund

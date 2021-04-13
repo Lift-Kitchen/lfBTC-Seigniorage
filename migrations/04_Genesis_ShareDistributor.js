@@ -1,6 +1,6 @@
 const INITIAL_LIFT_FOR_WBTC_LFBTC = 260714;
 const INITIAL_LIFT_FOR_LFBTC_LIFT = 782143;
-const INITIAL_CTRL = 8;
+const INITIAL_CTRL = 6;
   
   // Pools
   // deployed first

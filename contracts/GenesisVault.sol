@@ -60,7 +60,7 @@ abstract contract TokenVault is Operator {
     function stake(uint256 amount) public virtual {
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
-        IERC20(stakingToken).SafeTransferFrom(msg.sender, address(this), amount);
+        IERC20(stakingToken).safeTransferFrom(msg.sender, address(this), amount);
     }
 }
 
@@ -168,15 +168,16 @@ contract GenesisVault is TokenVault, ContractGuard {
     }
 
     function totalStakedValue() public view returns (uint256) {
-        return totalSupply().mul(getStakingTokenPrice().div(1e18));
+        return totalSupply().mul(1e10).mul(getStakingTokenPrice()).div(1e18);
     }
 
     function getStakingTokenPrice() public view returns (uint256) {
         return IOracle(theOracle).wbtcPriceOne();
     }
 
+    //returns share price as an 18 decimel number
     function getShareTokenPrice() public view returns (uint256) {
-        return (totalSupply().mul(2) + totalMultipliedWBTCTokens).mul(getStakingTokenPrice()).div(weeklyEmissions).div(variableReduction).div(1e18);
+        return (totalSupply().mul(2) + totalMultipliedWBTCTokens).mul(1e10).mul(getStakingTokenPrice()).div(weeklyEmissions).div(variableReduction).div(1e18);
     }
 
     // mints required peg (lfbtc) token and creates the initial staking/peg LP (wbtc/lfbtc)
@@ -191,23 +192,20 @@ contract GenesisVault is TokenVault, ContractGuard {
         uint256 initialStakingTokenBalance = IERC20(stakingToken).balanceOf(address(this));
         require(initialStakingTokenBalance > 0, 'No stakingToken to begin genesis');     
 
-        //allows us to only call this function once.
-        generated = true;
-
-        IBasisAsset(peg).mint(address(this), initialStakingTokenBalance);
+        IBasisAsset(peg).mint(address(this), initialStakingTokenBalance.mul(1e10).add(totalMultipliedWBTCTokens.mul(1e10).div(2)));
 
         //uint256 totalPegToken = IERC20(peg).balanceOf(address(this));
-        require(IERC20(peg).balanceOf(address(this)) > 0, 'No pegToken minted for genesis');
+        //require(IERC20(peg).balanceOf(address(this)) > 0, 'No pegToken minted for genesis');
 
-        require(IERC20(peg).balanceOf(address(this)) == initialStakingTokenBalance, 'We dont have equal parts staking and peg token, wtf');
+        //require(IERC20(peg).balanceOf(address(this)) * 1e10 == initialStakingTokenBalance, 'We dont have equal parts staking and peg token, wtf');
         
         uint256 liquidityTokens;
 
         IERC20(stakingToken).approve(address(router), initialStakingTokenBalance);
-        IERC20(peg).approve(address(router), initialStakingTokenBalance);
+        IERC20(peg).approve(address(router), initialStakingTokenBalance.mul(1e10).add(totalMultipliedWBTCTokens.mul(1e10).div(2)));
 
-        IUniswapV2Factory(router.factory()).createPair(stakingToken, peg);
-        (,,liquidityTokens) = router.addLiquidity(stakingToken, peg, initialStakingTokenBalance, initialStakingTokenBalance, 0, 0, ideaFund, block.timestamp + 15);
+        //IUniswapV2Factory(router.factory()).createPair(stakingToken, peg);
+        (,,liquidityTokens) = router.addLiquidity(stakingToken, peg, initialStakingTokenBalance, initialStakingTokenBalance.mul(1e10), 0, 0, ideaFund, block.timestamp + 15);
 
         emit Staked(address(ideaFund), liquidityTokens);
 
@@ -215,28 +213,33 @@ contract GenesisVault is TokenVault, ContractGuard {
         //uint256 stakingTokenPrice = getStakingTokenPrice();
 
         // Take the total multipliedStakingTokens / split the value in half / mint lfbtc tokens @ numberwbtc/2, mint lift tokens @ numwbtc/2/share value
-        IBasisAsset(peg).mint(address(this), totalMultipliedWBTCTokens.div(2));
-        IBasisAsset(share).mint(address(this), totalMultipliedWBTCTokens.div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice()));
+        //IBasisAsset(peg).mint(address(this), totalMultipliedWBTCTokens.mul(1e10).div(2));
+
+        //TODO Math update based on 10 digits
+        IBasisAsset(share).mint(address(this), totalMultipliedWBTCTokens.mul(1e10).div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice()));
          //= IOracle(theOracle).pairFor(router.factory(), peg, share);
+
+        IERC20(peg).approve(address(router), totalMultipliedWBTCTokens.mul(1e10).div(2));      
+        IERC20(share).approve(address(router), totalMultipliedWBTCTokens.mul(1e10).div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice()));
+
+        (,,liquidityTokens) = router.addLiquidity(peg, share, totalMultipliedWBTCTokens.mul(1e10).div(2), totalMultipliedWBTCTokens.mul(1e10).div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice()), 0, 0, address(this), block.timestamp + 15);
+
+        IERC20(pairTo).approve(lfbtcliftLPPool, liquidityTokens);         
 
         pairTo = IUniswapV2Factory(router.factory()).createPair(peg, share);
 
         for (uint256 i = 0; i < stakersList.length; i++) {
             StakingSeat memory seat = stakers[stakersList[i]];
-            uint256 pegAmount = seat.multipliedNumWBTCTokens.div(2);
-            uint256 shareAmount = seat.multipliedNumWBTCTokens.div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice());
+            uint256 pegPercentageAmount = ((seat.multipliedNumWBTCTokens.mul(1e10).mul(100)).div(totalMultipliedWBTCTokens.mul(1e10))).sub(100).mul(1e18).div(100);
+            //uint256 shareAmount = seat.multipliedNumWBTCTokens.mul(1e10).div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice());
             
-            IERC20(peg).approve(address(router), pegAmount);      
-            IERC20(share).approve(address(router), shareAmount);
-
-            (,,liquidityTokens) = router.addLiquidity(peg, share, pegAmount, shareAmount, 0, 0, address(this), block.timestamp + 15);
-
-            IERC20(pairTo).approve(lfbtcliftLPPool, liquidityTokens);
             //this should be stake the LP on behalf of the original staker, locked for timerpriod in the Vault
-            ILPTokenSharePool(lfbtcliftLPPool).stakeLP(address(stakersList[i]), address(this), liquidityTokens, true);
+            ILPTokenSharePool(lfbtcliftLPPool).stakeLP(address(stakersList[i]), address(this), liquidityTokens.mul(pegPercentageAmount).div(1e18), true);
 
             emit Staked(address(stakersList[i]), liquidityTokens);
         }
+
+        IOracle(theOracle).initialize();
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
@@ -266,6 +269,10 @@ contract GenesisVault is TokenVault, ContractGuard {
         Operator(share).transferOperator(target);
         Operator(share).transferOwnership(target);
         IERC20(share).transfer(target, IERC20(share).balanceOf(address(this)));
+
+        Operator(theOracle).transferOperator(target);
+        Operator(theOracle).transferOwnership(target);
+        //IERC20(share).transfer(target, IERC20(share).balanceOf(address(this)));
 
         // wbtc
         IERC20(stakingToken).transfer(target, IERC20(stakingToken).balanceOf(address(this)));
