@@ -2,5 +2,5 @@
 pragma solidity >=0.6.0;
 
 interface IIdeaFund {
-    function controlPrice() external pure returns (uint256);
+    function getControlPrice() external pure returns (uint256);
 }

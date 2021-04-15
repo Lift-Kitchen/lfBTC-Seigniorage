@@ -57,7 +57,7 @@ abstract contract TokenVault is Operator {
     }
 
     //We should only accept wbtc into the STAKE in any quanitity.
-    function stake(uint256 amount) public virtual {
+    function stake(uint256 amount, uint term) public virtual {
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
         IERC20(stakingToken).safeTransferFrom(msg.sender, address(this), amount);
@@ -70,7 +70,7 @@ contract GenesisVault is TokenVault, ContractGuard {
     using SafeMath for uint256;
 
     /* ========== DATA STRUCTURES ========== */
-    uint public currentMultiplier = 5; // change to 2 after 1m total value staked in wbtc
+    //uint public currentMultiplier = 5; // change to 2 after 1m total value staked in wbtc
     uint public weeklyEmissions = 20000;
     uint public variableReduction = 8;
     uint256 public totalMultipliedWBTCTokens = 0;
@@ -79,12 +79,6 @@ contract GenesisVault is TokenVault, ContractGuard {
     bool public migrated = false;
     bool public terminated = false;
     bool public generated = false;
-
-    struct StakingSeat {
-        //staked tokens * currentMultiplier
-        uint256 multipliedNumWBTCTokens;
-        bool isEntity;
-    }
 
     /* ========== STATE VARIABLES ========== */
 
@@ -98,7 +92,17 @@ contract GenesisVault is TokenVault, ContractGuard {
 
     address public theOracle;
 
+    struct StakingSeat {
+        //staked tokens * currentMultiplier
+        uint256 multipliedNumWBTCTokens2x;
+        uint256 multipliedNumWBTCTokens3x;
+        uint256 multipliedNumWBTCTokens4x;
+        uint256 multipliedNumWBTCTokens5x;
+        bool isEntity;
+    }
+
     mapping(address => StakingSeat) private stakers;
+
     address[] private stakersList;
     
     /* ========== CONSTRUCTOR ========== */
@@ -145,27 +149,43 @@ contract GenesisVault is TokenVault, ContractGuard {
         _;
     }
 
-    modifier updateStaking(address staker, uint256 amount) {
+    // term 1 = 2x, 30 days || 2 = 3x, 60 days || 3 = 4x, 90 days || 4 = 5x, 120 days
+    modifier updateStaking(address staker, uint256 amount, uint term) {
             //gives us a list of stakers to iterate on for the genesis moment.
+            require(term == 1 || term == 2 || term == 3 || term == 4, 'GenesisVault: requires term 1-4');
+
             if(!(stakers[staker].isEntity)) {
                 stakersList.push(staker);
             }
-
-            totalMultipliedWBTCTokens += amount.mul(currentMultiplier);
+    
             StakingSeat memory seat = stakers[staker];
-            seat.multipliedNumWBTCTokens += amount.mul(currentMultiplier);
+
+            if (term == 1) {
+                seat.multipliedNumWBTCTokens2x += amount.mul(2);
+                totalMultipliedWBTCTokens += amount.mul(2);
+            } else if (term == 2) {
+                seat.multipliedNumWBTCTokens3x += amount.mul(3);
+                totalMultipliedWBTCTokens += amount.mul(3);
+            } else if (term == 3) {
+                seat.multipliedNumWBTCTokens4x += amount.mul(4);
+                totalMultipliedWBTCTokens += amount.mul(4);
+            } else if (term == 4) {
+                seat.multipliedNumWBTCTokens5x += amount.mul(5);
+                totalMultipliedWBTCTokens += amount.mul(5);
+            }
+            
             seat.isEntity = true;
             stakers[staker] = seat;   
         _;
     }
 
-    function terminateStaking() onlyOperator public {
-        terminated = true;
-    }
+    // function terminateStaking() onlyOperator public {
+    //     terminated = true;
+    // }
 
-    function setCurrentMultplier(uint _newMultiplier) onlyOperator public {
-        currentMultiplier = _newMultiplier;
-    }
+    // function setCurrentMultplier(uint _newMultiplier) onlyOperator public {
+    //     currentMultiplier = _newMultiplier;
+    // }
 
     function totalStakedValue() public view returns (uint256) {
         return totalSupply().mul(1e10).mul(getStakingTokenPrice()).div(1e18);
@@ -210,15 +230,30 @@ contract GenesisVault is TokenVault, ContractGuard {
 
         for (uint256 i = 0; i < stakersList.length; i++) {
             StakingSeat memory seat = stakers[stakersList[i]];
-            uint256 pegPercentageAmount = ((seat.multipliedNumWBTCTokens.mul(1e10).mul(1e18)).div(totalMultipliedWBTCTokens.mul(1e10)));
+            
+            uint256 pegPercentageAmount = ((seat.multipliedNumWBTCTokens2x.mul(1e10).mul(1e18)).div(totalMultipliedWBTCTokens.mul(1e10)));
+            if (pegPercentageAmount > 0) {
+                //this should be stake the LP on behalf of the original staker, locked for timerpriod in the Vault
+                ILPTokenSharePool(lfbtcliftLPPool).stakeLP(address(stakersList[i]), address(this), liquidityTokens.mul(pegPercentageAmount).div(1e18), 1);
+            }
 
-//console.log(pegPercentageAmount);
-//console.log(liquidityTokens.mul(pegPercentageAmount).div(1e18));
+            pegPercentageAmount = ((seat.multipliedNumWBTCTokens3x.mul(1e10).mul(1e18)).div(totalMultipliedWBTCTokens.mul(1e10)));
+            if (pegPercentageAmount > 0) {
+                //this should be stake the LP on behalf of the original staker, locked for timerpriod in the Vault
+                ILPTokenSharePool(lfbtcliftLPPool).stakeLP(address(stakersList[i]), address(this), liquidityTokens.mul(pegPercentageAmount).div(1e18), 2);
+            }
 
-            //this should be stake the LP on behalf of the original staker, locked for timerpriod in the Vault
-            ILPTokenSharePool(lfbtcliftLPPool).stakeLP(address(stakersList[i]), address(this), liquidityTokens.mul(pegPercentageAmount).div(1e18), true);
+            pegPercentageAmount = ((seat.multipliedNumWBTCTokens4x.mul(1e10).mul(1e18)).div(totalMultipliedWBTCTokens.mul(1e10)));
+            if (pegPercentageAmount > 0) {
+                //this should be stake the LP on behalf of the original staker, locked for timerpriod in the Vault
+                ILPTokenSharePool(lfbtcliftLPPool).stakeLP(address(stakersList[i]), address(this), liquidityTokens.mul(pegPercentageAmount).div(1e18), 3);
+            }
 
-            emit Staked(address(stakersList[i]), liquidityTokens);
+            pegPercentageAmount = ((seat.multipliedNumWBTCTokens5x.mul(1e10).mul(1e18)).div(totalMultipliedWBTCTokens.mul(1e10)));
+            if (pegPercentageAmount > 0) {
+                //this should be stake the LP on behalf of the original staker, locked for timerpriod in the Vault
+                ILPTokenSharePool(lfbtcliftLPPool).stakeLP(address(stakersList[i]), address(this), liquidityTokens.mul(pegPercentageAmount).div(1e18), 4);
+            }            
         }
     }
 
@@ -232,20 +267,20 @@ contract GenesisVault is TokenVault, ContractGuard {
        
         addliquidityForPegShare();
 
-        //IOracle(theOracle).initialize();
+        IOracle(theOracle).initialize();
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
-    function stake(uint256 amount)
+    function stake(uint256 amount, uint term)
         public
         override
         onlyOneBlock
         started
-        updateStaking(msg.sender, amount)
+        updateStaking(msg.sender, amount, term)
     {
         require(amount > 0, 'GenesisVault: Cannot stake 0');
-        super.stake(amount);
+        super.stake(amount, term);
         emit Staked(msg.sender, amount);
     }
 

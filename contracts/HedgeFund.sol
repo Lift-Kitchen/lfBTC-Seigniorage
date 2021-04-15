@@ -65,14 +65,14 @@ contract HedgeFund is Operator, ContractGuard {
     address public theOracle;
     
     //validate this is 500
-    uint public startingValue = 500e8;
+    uint public startingValue = 500e18;
     uint256 public starttime;
     uint256 public haifValue;
 
     mapping(address => uint256) private _haifBalances;
 
     //validate this is .25% (1.0025)
-    uint public growthRate = uint(25).div(1000);
+    uint public growthRate = 10025;
 
     bool migrated = false;
     bool _hasOracle = false;
@@ -188,9 +188,9 @@ contract HedgeFund is Operator, ContractGuard {
             return amount;
     }
 
-    function hedgePrice() public view hasOracle returns (uint256) {
+    function hedgePrice() public view returns (uint256) {
             uint daysSinceStart = (block.timestamp - starttime) / 60 / 60 / 24;
-            return startingValue.mul((1+growthRate)**daysSinceStart);
+            return startingValue.mul(((growthRate)**daysSinceStart).div(1e26)).div(1e14);
     }
 
     // YES this 100% can rug pull the IdeaFund just like every other stablization fund via with a Migrate Function

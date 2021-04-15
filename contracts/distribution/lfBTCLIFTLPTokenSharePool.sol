@@ -84,13 +84,29 @@ contract lfBTCLIFTLPTokenSharePool is
     uint256 public starttime;
     uint256 public periodFinish = 0;
     uint256 public rewardRate = 0;
-    uint256 public lockoutPeriod = 30; // no touching for 30 days if you got the free genesis money!
+    
+    uint public TermOne = 30;
+    uint public TermTwo = 60;
+    uint public TermThree = 90;
+    uint public TermFour = 120;
 
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
     mapping(address => uint256) public lockedOutDate;
+
+    struct StakingSeat {
+        //staked tokens * currentMultiplier
+        uint256 notmultipliedNumbWBTCTokens;
+        uint256 multipliedNumWBTCTokens2x;
+        uint256 multipliedNumWBTCTokens3x;
+        uint256 multipliedNumWBTCTokens4x;
+        uint256 multipliedNumWBTCTokens5x;
+        bool isEntity;
+    }
+
+    mapping(address => StakingSeat) private stakers;
 
     constructor(
         address _boardroom,
@@ -150,15 +166,30 @@ contract lfBTCLIFTLPTokenSharePool is
         updateReward(msg.sender)
     {
         require(amount > 0, 'lfBTCLIFTLPTokenSharePool: Cannot stake 0');
+        StakingSeat memory seat = stakers[msg.sender];
+        seat.notmultipliedNumbWBTCTokens += amount;
+        stakers[msg.sender] = seat;  
         super.stake(msg.sender, msg.sender, amount);
         emit Staked(msg.sender, amount);
     }
 
-    function stakeLP(address staker, address from, uint256 amount, bool lockout) external updateReward(staker)
+    function stakeLP(address staker, address from, uint256 amount, uint term) external updateReward(staker)
     {
         require(amount > 0, 'lfBTCLIFTLPTokenSharePool: cannot stake 0');
+
+        StakingSeat memory seat = stakers[staker];
+
+        if(term == 1) {
+            seat.multipliedNumWBTCTokens2x += amount;
+        } else if (term == 2) {
+            seat.multipliedNumWBTCTokens3x += amount;
+        } else if (term == 3) {
+            seat.multipliedNumWBTCTokens4x += amount;
+        } else if (term == 4) {
+            seat.multipliedNumWBTCTokens5x += amount;
+        }
         
-        if(lockout) lockedOutDate[staker] = block.timestamp;
+        lockedOutDate[staker] = block.timestamp;
         super.stake(staker, from, amount);
         emit Staked(staker, amount);
     }
@@ -171,9 +202,66 @@ contract lfBTCLIFTLPTokenSharePool is
         require(amount > 0, 'lfBTCLIFTLPTokenSharePool: Cannot withdraw 0');
         require(amount <= super.balanceOf(msg.sender), 'lfBTCLIFTLPTokenSharePool: Cannot withdraw more than staked');
 
-        require(((block.timestamp - lockedOutDate[msg.sender]) / 60 / 60 / 24) >= lockoutPeriod, 'lfBTCLiftLPTokenSharePool: still in lockout period');
-        super.withdraw(amount);
-        emit Withdrawn(msg.sender, amount);
+        StakingSeat memory seat = stakers[msg.sender];
+        uint256 tokensAvailable = 0;
+
+        if (seat.notmultipliedNumbWBTCTokens > 0) {
+            tokensAvailable = seat.notmultipliedNumbWBTCTokens;
+            seat.notmultipliedNumbWBTCTokens = 0;
+            stakers[msg.sender] = seat;  
+            super.withdraw(tokensAvailable);
+            emit Withdrawn(msg.sender, tokensAvailable);
+        }
+
+        if ((block.timestamp - lockedOutDate[msg.sender]) / 60 / 60 / 24 >= TermOne) {
+            if (seat.multipliedNumWBTCTokens2x > 0) {
+                tokensAvailable = seat.multipliedNumWBTCTokens2x;
+                seat.multipliedNumWBTCTokens2x = 0;
+                stakers[msg.sender] = seat;  
+                super.withdraw(tokensAvailable);
+                emit Withdrawn(msg.sender, tokensAvailable);
+            }
+        } else {
+            return;
+        }
+
+        if ((block.timestamp - lockedOutDate[msg.sender]) / 60 / 60 / 24 >= TermTwo) {            
+            if (seat.multipliedNumWBTCTokens3x > 0) {
+                tokensAvailable = seat.multipliedNumWBTCTokens3x;
+                seat.multipliedNumWBTCTokens3x = 0;
+                stakers[msg.sender] = seat;  
+                super.withdraw(tokensAvailable);
+                emit Withdrawn(msg.sender, tokensAvailable);
+            }
+        } else {
+            return;
+        }
+
+        if ((block.timestamp - lockedOutDate[msg.sender]) / 60 / 60 / 24 >= TermThree) {            
+            if (seat.multipliedNumWBTCTokens4x > 0) {
+                tokensAvailable = seat.multipliedNumWBTCTokens4x;
+                seat.multipliedNumWBTCTokens4x = 0;
+                stakers[msg.sender] = seat;  
+                super.withdraw(tokensAvailable);
+                emit Withdrawn(msg.sender, tokensAvailable);
+            }
+        } else {
+            return;
+        }
+
+        if ((block.timestamp - lockedOutDate[msg.sender]) / 60 / 60 / 24 >= TermFour) {            
+            if (seat.multipliedNumWBTCTokens5x > 0) {
+                tokensAvailable = seat.multipliedNumWBTCTokens5x;
+                seat.multipliedNumWBTCTokens5x = 0;
+                stakers[msg.sender] = seat;  
+                super.withdraw(tokensAvailable);
+                emit Withdrawn(msg.sender, tokensAvailable);
+            }
+        } else {
+            return;
+        }
+
+        require(false, 'lfBTCLIFTLPTokenSharePool: no tokens eligible for withdrawl due to lockout period');
     }
 
     function exit() external {

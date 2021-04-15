@@ -149,7 +149,7 @@ contract Oracle is Epoch {
         } else if (token == share) {
             return priceFromPair(pairPegtoShare);
         } else if (token == control) {
-            IIdeaFund(ideafund).controlPrice();
+            IIdeaFund(ideafund).getControlPrice();
         } else if(token == hedge) {
             IHedgeFund(hedgefund).hedgePrice();
         } else if(token == staking) {
