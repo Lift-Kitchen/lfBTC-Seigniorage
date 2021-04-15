@@ -180,66 +180,59 @@ contract GenesisVault is TokenVault, ContractGuard {
         return (totalSupply().mul(2) + totalMultipliedWBTCTokens).mul(1e10).mul(getStakingTokenPrice()).div(weeklyEmissions).div(variableReduction).div(1e18);
     }
 
-    // mints required peg (lfbtc) token and creates the initial staking/peg LP (wbtc/lfbtc)
-    function beginGenesis() onlyOperator public {
-        // PHASE 1 - Create the stakingToken/Peg Pair
-        //in lfBTC mint = totalStakedValue
-        //create LP of wbtc and lfbtc to IdeaFund
+    function mintPegToken() onlyOperator public {
+        require(IERC20(stakingToken).balanceOf(address(this)) > 0, 'No stakingToken to begin genesis');     
 
-        //to many variables "stack to deep" compile error forced some of this sloppiness 
-        
-        //uint256 totalStakingTokens = IERC20(stakingToken).balanceOf(address(this));
-        uint256 initialStakingTokenBalance = IERC20(stakingToken).balanceOf(address(this));
-        require(initialStakingTokenBalance > 0, 'No stakingToken to begin genesis');     
+        IBasisAsset(peg).mint(address(this), IERC20(stakingToken).balanceOf(address(this)).mul(1e10).add(totalMultipliedWBTCTokens.mul(1e10).div(2)));
+    }
 
-        IBasisAsset(peg).mint(address(this), initialStakingTokenBalance.mul(1e10).add(totalMultipliedWBTCTokens.mul(1e10).div(2)));
+    function addliquidityForStakingPeg() onlyOperator public {
+        IERC20(stakingToken).approve(address(router), IERC20(stakingToken).balanceOf(address(this)));
+        IERC20(peg).approve(address(router), IERC20(stakingToken).balanceOf(address(this)).mul(1e10).add(totalMultipliedWBTCTokens.mul(1e10).div(2)));
 
-        //uint256 totalPegToken = IERC20(peg).balanceOf(address(this));
-        //require(IERC20(peg).balanceOf(address(this)) > 0, 'No pegToken minted for genesis');
+        router.addLiquidity(stakingToken, peg, IERC20(stakingToken).balanceOf(address(this)), IERC20(stakingToken).balanceOf(address(this)).mul(1e10), 0, 0, ideaFund, block.timestamp + 15);
+    }
 
-        //require(IERC20(peg).balanceOf(address(this)) * 1e10 == initialStakingTokenBalance, 'We dont have equal parts staking and peg token, wtf');
-        
-        uint256 liquidityTokens;
-
-        IERC20(stakingToken).approve(address(router), initialStakingTokenBalance);
-        IERC20(peg).approve(address(router), initialStakingTokenBalance.mul(1e10).add(totalMultipliedWBTCTokens.mul(1e10).div(2)));
-
-        //IUniswapV2Factory(router.factory()).createPair(stakingToken, peg);
-        (,,liquidityTokens) = router.addLiquidity(stakingToken, peg, initialStakingTokenBalance, initialStakingTokenBalance.mul(1e10), 0, 0, ideaFund, block.timestamp + 15);
-
-        emit Staked(address(ideaFund), liquidityTokens);
-
-        //need to validate that this returns the wbtc price
-        //uint256 stakingTokenPrice = getStakingTokenPrice();
-
-        // Take the total multipliedStakingTokens / split the value in half / mint lfbtc tokens @ numberwbtc/2, mint lift tokens @ numwbtc/2/share value
-        //IBasisAsset(peg).mint(address(this), totalMultipliedWBTCTokens.mul(1e10).div(2));
-
-        //TODO Math update based on 10 digits
+    function mintShareToken() onlyOperator public {
         IBasisAsset(share).mint(address(this), totalMultipliedWBTCTokens.mul(1e10).div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice()));
-         //= IOracle(theOracle).pairFor(router.factory(), peg, share);
+    }
 
+    function addliquidityForPegShare() onlyOperator public {
+        uint256 liquidityTokens = 0;
+        
         IERC20(peg).approve(address(router), totalMultipliedWBTCTokens.mul(1e10).div(2));      
         IERC20(share).approve(address(router), totalMultipliedWBTCTokens.mul(1e10).div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice()));
 
-        (,,liquidityTokens) = router.addLiquidity(peg, share, totalMultipliedWBTCTokens.mul(1e10).div(2), totalMultipliedWBTCTokens.mul(1e10).div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice()), 0, 0, address(this), block.timestamp + 15);
-
-        IERC20(pairTo).approve(lfbtcliftLPPool, liquidityTokens);         
-
         pairTo = IUniswapV2Factory(router.factory()).createPair(peg, share);
+        (,,liquidityTokens) = router.addLiquidity(peg, share, totalMultipliedWBTCTokens.mul(1e10).div(2), totalMultipliedWBTCTokens.mul(1e10).div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice()), 0, 0, address(this), block.timestamp + 15);    
+
+        IERC20(pairTo).approve(lfbtcliftLPPool, liquidityTokens);    
 
         for (uint256 i = 0; i < stakersList.length; i++) {
             StakingSeat memory seat = stakers[stakersList[i]];
-            uint256 pegPercentageAmount = ((seat.multipliedNumWBTCTokens.mul(1e10).mul(100)).div(totalMultipliedWBTCTokens.mul(1e10))).sub(100).mul(1e18).div(100);
-            //uint256 shareAmount = seat.multipliedNumWBTCTokens.mul(1e10).div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice());
-            
+            uint256 pegPercentageAmount = ((seat.multipliedNumWBTCTokens.mul(1e10).mul(1e18)).div(totalMultipliedWBTCTokens.mul(1e10)));
+
+//console.log(pegPercentageAmount);
+//console.log(liquidityTokens.mul(pegPercentageAmount).div(1e18));
+
             //this should be stake the LP on behalf of the original staker, locked for timerpriod in the Vault
             ILPTokenSharePool(lfbtcliftLPPool).stakeLP(address(stakersList[i]), address(this), liquidityTokens.mul(pegPercentageAmount).div(1e18), true);
 
             emit Staked(address(stakersList[i]), liquidityTokens);
         }
+    }
 
-        IOracle(theOracle).initialize();
+    // mints required peg (lfbtc) token and creates the initial staking/peg LP (wbtc/lfbtc)
+    function beginGenesis() onlyOperator public {
+        mintPegToken();
+      
+        addliquidityForStakingPeg();
+
+        mintShareToken();
+       
+        addliquidityForPegShare();
+
+        //IOracle(theOracle).initialize();
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */

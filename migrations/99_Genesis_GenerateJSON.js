@@ -16,16 +16,16 @@ function Tokens() {
     .map(filename => filename.replace('.sol', ''));
 }
 
-// function Utils() {
-//     return fs.readdirSync(path.resolve(__dirname, '../contracts/utils'))
-//     .filter(filename => filename.endsWith('Oracle.sol'))
-//     .map(filename => filename.replace('.sol', ''));
-// }
 function Utils() {
-  return fs.readdirSync(path.resolve(__dirname, '../contracts/test'))
-  .filter(filename => filename.endsWith('MockOracle.sol'))
-  .map(filename => filename.replace('.sol', ''));
+    return fs.readdirSync(path.resolve(__dirname, '../contracts/utils'))
+    .filter(filename => filename.endsWith('Oracle.sol'))
+    .map(filename => filename.replace('.sol', ''));
 }
+// function Utils() {
+//   return fs.readdirSync(path.resolve(__dirname, '../contracts/test'))
+//   .filter(filename => filename.endsWith('MockOracle.sol'))
+//   .map(filename => filename.replace('.sol', ''));
+// }
 
 // Deployment and ABI will be generated for contracts listed on here.
 // The deployment thus can be used on lift.kitchen-frontend.

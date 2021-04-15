@@ -159,7 +159,6 @@ contract lfBTCLIFTLPTokenSharePool is
         require(amount > 0, 'lfBTCLIFTLPTokenSharePool: cannot stake 0');
         
         if(lockout) lockedOutDate[staker] = block.timestamp;
-        
         super.stake(staker, from, amount);
         emit Staked(staker, amount);
     }

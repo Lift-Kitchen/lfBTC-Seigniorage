@@ -140,16 +140,52 @@ contract Oracle is Epoch {
     }
 
     function priceOf(address token) external view returns (uint256 price) {
+        return _priceOf(token);
+    }
+
+    function _priceOf(address token) internal view returns (uint256 price) {
          if (token == peg) {
-            return pricePegAverage;
+            return priceFromPair(pairStakingtoPeg);
         } else if (token == share) {
-            return priceShareAverage;
+            return priceFromPair(pairPegtoShare);
         } else if (token == control) {
-            IIdeaFund(token).controlPrice();
+            IIdeaFund(ideafund).controlPrice();
         } else if(token == hedge) {
-            IHedgeFund(token).hedgePrice();
+            IHedgeFund(hedgefund).hedgePrice();
         } else if(token == staking) {
             return uint256(linkOracle.latestAnswer() * 1e10);
+        }
+    }
+
+    // always returns the price for token1 
+    function priceFromPair(IUniswapV2Pair pair) public view returns (uint256 price) {
+        uint256 token0Supply = 0;
+        uint256 token1Supply = 0;
+
+        (token0Supply, token1Supply, ) = pair.getReserves();
+
+        if (pair.token0() == staking) {
+            token0Supply = token0Supply.mul(1e10);
+            
+            token0Supply = token0Supply.mul(1e8);
+            
+            return token0Supply.div(token1Supply).mul(_priceOf(pair.token0())).div(1e8);
+        } else if (pair.token1() == staking) {
+            token1Supply = token1Supply.mul(1e10);
+
+            token1Supply = token1Supply.mul(1e8);
+
+            return token1Supply.div(token0Supply).mul(_priceOf(pair.token1())).div(1e8);
+
+        } else if (pair.token0() == peg) {
+            token0Supply = token0Supply.mul(1e8);
+
+            return token0Supply.div(token1Supply).mul(_priceOf(pair.token0())).div(1e8);
+
+        } else if (pair.token1() == peg) {                    
+            token1Supply = token1Supply.mul(1e8);
+
+            return token1Supply.div(token0Supply).mul(_priceOf(pair.token1())).div(1e8);
         }
     }
 

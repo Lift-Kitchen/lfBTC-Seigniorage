@@ -14,6 +14,7 @@ const GENESIS_START_DATE = 1618074000;
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000';
 const ETH = utils.parseEther('1');
 
+
 async function latestBlocktime(provider: Provider): Promise<number> {
     const { timestamp } = await provider.getBlock('latest');
     return timestamp;
@@ -87,9 +88,11 @@ describe('GenesisVault', () => {
 
     let operator: SignerWithAddress;
     let addr1: SignerWithAddress;
+    let addr2: SignerWithAddress;
+    let addr3: SignerWithAddress;
 
     before(async () => {
-        [operator, addr1] = await ethers.getSigners();
+        [operator, addr1, addr2, addr3] = await ethers.getSigners();
 
         lfBTCTokenFactory = await ethers.getContractFactory('LFBTC');
         liftTokenFactory = await ethers.getContractFactory('LIFT');
@@ -221,11 +224,11 @@ describe('GenesisVault', () => {
                 expect(await genesisVault.terminated()).to.be.true;
             });
 
-            it('should not allow beginGenesis until terminated', async () => {
-                await expect(genesisVault.beginGenesis()).to.be.revertedWith(
-                    "VM Exception while processing transaction: revert You must terminate before executing genesis"
-                );
-            });
+            // it('should not allow beginGenesis until terminated', async () => {
+            //     await expect(genesisVault.beginGenesis()).to.be.revertedWith(
+            //         "VM Exception while processing transaction: revert You must terminate before executing genesis"
+            //     );
+            // });
 
             it('should not begin genesis without a stakingToken balance', async () => {
                 await genesisVault.terminateStaking();
@@ -253,6 +256,31 @@ describe('GenesisVault', () => {
                 await mockwBTCToken.connect(operator).approve(uniswapRouter.address, kwTCAmountToMint);
 
                 expect(await genesisVault.connect(operator).getStakingTokenPrice()).to.not.be.eq(0);
+            });
+
+            it('Can do genesis', async () => {
+                const amountToStake = BigNumber.from(2221500000);
+
+                console.log(lpToken);
+
+                await mockwBTCToken.mint(addr2.address, amountToStake.div(2));
+                await mockwBTCToken.connect(addr2).approve(genesisVault.address, amountToStake.div(2));
+                await genesisVault.connect(addr2).stake(amountToStake.div(2));
+
+                await mockwBTCToken.mint(addr3.address, amountToStake.div(5));
+                await mockwBTCToken.connect(addr3).approve(genesisVault.address, amountToStake.div(5));
+                await genesisVault.connect(addr3).stake(amountToStake.div(5));
+
+                await mockwBTCToken.mint(addr1.address, amountToStake);
+                await mockwBTCToken.connect(addr1).approve(genesisVault.address, amountToStake);
+                await genesisVault.connect(addr1).stake(amountToStake);
+
+                await lfBTCToken.connect(operator).transferOperator(genesisVault.address);
+                await liftToken.connect(operator).transferOperator(genesisVault.address);
+                await oracle.connect(operator).transferOperator(genesisVault.address);
+
+                
+                await genesisVault.beginGenesis();
             });
         });
     });
