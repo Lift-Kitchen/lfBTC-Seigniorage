@@ -27,6 +27,8 @@ const GenesisVault = artifacts.require('GenesisVault');
 const lfbtcliftLPPool = artifacts.require('lfBTCLIFTLPTokenSharePool');
 const wBTClfBTCLPPool = artifacts.require('wBTClfBTCLPTokenSharePool');
 
+const singlePoolalUSD = artifacts.require('shortStakealUSDPool');
+
 const UniswapV2Factory = artifacts.require('UniswapV2Factory');
 const UniswapV2Router02 = artifacts.require('UniswapV2Router02');
 
@@ -95,7 +97,10 @@ async function migration(deployer, network, accounts) {
     
     // Deploy Pools
     await deployer.deploy(wBTClfBTCLPPool, Boardroom.address, share.address, wbtcpegPair, POOL_START_DATE);
-    await deployer.deploy(lfbtcliftLPPool, Boardroom.address, share.address, pegsharePair, POOL_START_DATE)
+    await deployer.deploy(lfbtcliftLPPool, Boardroom.address, share.address, pegsharePair, POOL_START_DATE);
+
+    const alUSD = "0xbc6da0fe9ad5f3b0d58160288917aa56653660e9";
+    await deployer.deploy(singlePoolalUSD, share.address, alUSD, POOL_START_DATE);
     
     //constructor(address _theOracle, address _peg, address _share, address _stakingToken, address _lfbtcliftLPPool, address _router, address _ideaFund) {
     await deployer.deploy(GenesisVault, Oracle.address, peg.address, share.address, wbtc.address, lfbtcliftLPPool.address, uniswapRouter.address, ideafund.address, GENESIS_START_DATE);

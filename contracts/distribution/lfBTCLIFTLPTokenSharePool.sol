@@ -203,11 +203,13 @@ contract lfBTCLIFTLPTokenSharePool is
     {
         StakingSeat memory seat = stakers[msg.sender];
         uint256 tokensAvailable = 0;
+        uint256 tokensWithdrawn = 0;
 
         if (seat.notmultipliedNumbWBTCTokens > 0) {
             tokensAvailable = seat.notmultipliedNumbWBTCTokens;
             seat.notmultipliedNumbWBTCTokens = 0;
             stakers[msg.sender] = seat;  
+            tokensWithdrawn = tokensAvailable;
             super.withdraw(tokensAvailable);
             emit Withdrawn(msg.sender, tokensAvailable);
         }
@@ -217,6 +219,7 @@ contract lfBTCLIFTLPTokenSharePool is
                 tokensAvailable = seat.multipliedNumWBTCTokens2x;
                 seat.multipliedNumWBTCTokens2x = 0;
                 stakers[msg.sender] = seat;  
+                tokensWithdrawn += tokensAvailable;
                 super.withdraw(tokensAvailable);
                 emit Withdrawn(msg.sender, tokensAvailable);
             }
@@ -229,6 +232,7 @@ contract lfBTCLIFTLPTokenSharePool is
                 tokensAvailable = seat.multipliedNumWBTCTokens3x;
                 seat.multipliedNumWBTCTokens3x = 0;
                 stakers[msg.sender] = seat;  
+                tokensWithdrawn += tokensAvailable;
                 super.withdraw(tokensAvailable);
                 emit Withdrawn(msg.sender, tokensAvailable);
             }
@@ -241,6 +245,7 @@ contract lfBTCLIFTLPTokenSharePool is
                 tokensAvailable = seat.multipliedNumWBTCTokens4x;
                 seat.multipliedNumWBTCTokens4x = 0;
                 stakers[msg.sender] = seat;  
+                tokensWithdrawn += tokensAvailable;
                 super.withdraw(tokensAvailable);
                 emit Withdrawn(msg.sender, tokensAvailable);
             }
@@ -253,6 +258,7 @@ contract lfBTCLIFTLPTokenSharePool is
                 tokensAvailable = seat.multipliedNumWBTCTokens5x;
                 seat.multipliedNumWBTCTokens5x = 0;
                 stakers[msg.sender] = seat;  
+                tokensWithdrawn += tokensAvailable;
                 super.withdraw(tokensAvailable);
                 emit Withdrawn(msg.sender, tokensAvailable);
             }
@@ -260,7 +266,9 @@ contract lfBTCLIFTLPTokenSharePool is
             return;
         }
 
-        require(false, 'lfBTCLIFTLPTokenSharePool: no tokens eligible for withdrawl due to lockout period');
+        require(tokensWithdrawn > 0, 'lfBTCLIFTLPTokenSharePool: no tokens eligible for withdrawl due to lockout period');
+
+        emit Withdrawn(msg.sender, tokensWithdrawn);
     }
 
     function exit() external {
