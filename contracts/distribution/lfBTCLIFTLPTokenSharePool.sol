@@ -188,6 +188,8 @@ contract lfBTCLIFTLPTokenSharePool is
         } else if (term == 4) {
             seat.multipliedNumWBTCTokens5x += amount;
         }
+
+        stakers[staker] = seat;  
         
         lockedOutDate[staker] = block.timestamp;
         super.stake(staker, from, amount);
@@ -199,9 +201,6 @@ contract lfBTCLIFTLPTokenSharePool is
         override
         updateReward(msg.sender)
     {
-        require(amount > 0, 'lfBTCLIFTLPTokenSharePool: Cannot withdraw 0');
-        require(amount <= super.balanceOf(msg.sender), 'lfBTCLIFTLPTokenSharePool: Cannot withdraw more than staked');
-
         StakingSeat memory seat = stakers[msg.sender];
         uint256 tokensAvailable = 0;
 
