@@ -80,7 +80,7 @@ contract wBTClfBTCLPTokenSharePool is
     address public boardroom;
     address public share; // lift
 
-    uint256 public DURATION = 365 days;
+    uint256 public DURATION = 730 days;
 
     uint256 public starttime;
     uint256 public periodFinish = 0;

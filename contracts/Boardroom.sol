@@ -66,7 +66,7 @@ contract Boardroom is ShareWrapper, ContractGuard, Operator {
     BoardSnapshotShare[] private boardShareHistory;
     BoardSnapshotControl[] private boardControlHistory;
 
-    uint daysRequiredStaked = 60; // staking less than X days = X - Y reduction in withdrawl, Y = days staked
+    uint daysRequiredStaked = 90; // staking less than X days = X - Y reduction in withdrawl, Y = days staked
     address ideaFund; //Where the forfeited shares end up
     address theOracle;
 

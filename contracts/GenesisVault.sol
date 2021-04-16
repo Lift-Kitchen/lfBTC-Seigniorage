@@ -71,8 +71,8 @@ contract GenesisVault is TokenVault, ContractGuard {
 
     /* ========== DATA STRUCTURES ========== */
     //uint public currentMultiplier = 5; // change to 2 after 1m total value staked in wbtc
-    uint public weeklyEmissions = 20000;
-    uint public variableReduction = 8;
+    uint public weeklyEmissions = 10000;
+    uint public variableReduction = 10;
     uint256 public totalMultipliedWBTCTokens = 0;
     address public pairTo;
 
