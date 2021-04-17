@@ -256,8 +256,27 @@ describe('GenesisVault', () => {
 
                 await lfBTCToken.connect(operator).transferOperator(genesisVault.address);
                 await liftToken.connect(operator).transferOperator(genesisVault.address);
-                
+
                 await genesisVault.beginGenesis();
+            });
+
+            it.only('Can do genesis up to x stakers', async () => {
+                const amountToStake = BigNumber.from('100');
+                let signers = await ethers.getSigners();
+
+                for (let i = 0; i < signers.length; ++i) { // 20
+                    await mockwBTCToken.mint(signers[i].address, amountToStake);
+                    await mockwBTCToken.connect(signers[i]).approve(genesisVault.address, amountToStake);
+                    await genesisVault.connect(signers[i]).stake(amountToStake, BigNumber.from(4));
+                }
+
+                await lfBTCToken.connect(operator).transferOperator(genesisVault.address);
+                await liftToken.connect(operator).transferOperator(genesisVault.address);
+                await oracle.connect(operator).transferOperator(genesisVault.address);
+
+                const tx = await genesisVault.beginGenesis();
+                const receipt = await tx.wait();
+                expect(receipt.gasUsed).to.be.lte(12e6)
             });
         });
     });

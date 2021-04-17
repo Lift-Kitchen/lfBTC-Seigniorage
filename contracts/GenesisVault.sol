@@ -12,9 +12,9 @@ pragma solidity >=0.6.0;
 // - Final step call Migrate to migrate token ownership to Treasury
 
 // Webpage:
-// Allows people to stake wbtc, shows the total staked wbtc, lfbtc value, lift value (formula), 
+// Allows people to stake wbtc, shows the total staked wbtc, lfbtc value, lift value (formula),
 // calculates and shows the initial pool values
-// 
+//
 // shows list of addresses with amount staked. (may require making the staker list / struct public?)
 
 import '@openzeppelin/contracts/math/Math.sol';
@@ -104,7 +104,7 @@ contract GenesisVault is TokenVault, ContractGuard {
     mapping(address => StakingSeat) private stakers;
 
     address[] private stakersList;
-    
+
     /* ========== CONSTRUCTOR ========== */
     // Oracle - Oracle Address
     // PEG - lfbtc
@@ -114,14 +114,14 @@ contract GenesisVault is TokenVault, ContractGuard {
     // lfbtc + LIFT liqudity pool
     // router - Uniswap Router
     // IdeaFund - Idea Fund Address
-    constructor(address _theOracle, 
-                address _peg, 
-                address _share, 
-                address _stakingToken, 
-                address _lfbtcliftLPPool, 
-                address _router, 
-                address _ideaFund, 
-                uint256 _startTime) 
+    constructor(address _theOracle,
+                address _peg,
+                address _share,
+                address _stakingToken,
+                address _lfbtcliftLPPool,
+                address _router,
+                address _ideaFund,
+                uint256 _startTime)
     {
         theOracle = _theOracle;
         peg = _peg;
@@ -157,7 +157,7 @@ contract GenesisVault is TokenVault, ContractGuard {
             if(!(stakers[staker].isEntity)) {
                 stakersList.push(staker);
             }
-    
+
             StakingSeat memory seat = stakers[staker];
 
             if (term == 1) {
@@ -173,9 +173,9 @@ contract GenesisVault is TokenVault, ContractGuard {
                 seat.multipliedNumWBTCTokens5x += amount.mul(5);
                 totalMultipliedWBTCTokens += amount.mul(5);
             }
-            
+
             seat.isEntity = true;
-            stakers[staker] = seat;   
+            stakers[staker] = seat;
         _;
     }
 
@@ -201,7 +201,7 @@ contract GenesisVault is TokenVault, ContractGuard {
     }
 
     function mintPegToken() onlyOperator public {
-        require(IERC20(stakingToken).balanceOf(address(this)) > 0, 'No stakingToken to begin genesis');     
+        require(IERC20(stakingToken).balanceOf(address(this)) > 0, 'No stakingToken to begin genesis');
 
         IBasisAsset(peg).mint(address(this), IERC20(stakingToken).balanceOf(address(this)).mul(1e10).add(totalMultipliedWBTCTokens.mul(1e10).div(2)));
     }
@@ -219,18 +219,18 @@ contract GenesisVault is TokenVault, ContractGuard {
 
     function addliquidityForPegShare() onlyOperator public {
         uint256 liquidityTokens = 0;
-        
-        IERC20(peg).approve(address(router), totalMultipliedWBTCTokens.mul(1e10).div(2));      
+
+        IERC20(peg).approve(address(router), totalMultipliedWBTCTokens.mul(1e10).div(2));
         IERC20(share).approve(address(router), totalMultipliedWBTCTokens.mul(1e10).div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice()));
 
         pairTo = IUniswapV2Factory(router.factory()).createPair(peg, share);
-        (,,liquidityTokens) = router.addLiquidity(peg, share, totalMultipliedWBTCTokens.mul(1e10).div(2), totalMultipliedWBTCTokens.mul(1e10).div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice()), 0, 0, address(this), block.timestamp + 15);    
+        (,,liquidityTokens) = router.addLiquidity(peg, share, totalMultipliedWBTCTokens.mul(1e10).div(2), totalMultipliedWBTCTokens.mul(1e10).div(2).mul(getStakingTokenPrice()).div(getShareTokenPrice()), 0, 0, address(this), block.timestamp + 15);
 
-        IERC20(pairTo).approve(lfbtcliftLPPool, liquidityTokens);    
+        IERC20(pairTo).approve(lfbtcliftLPPool, liquidityTokens);
 
         for (uint256 i = 0; i < stakersList.length; i++) {
             StakingSeat memory seat = stakers[stakersList[i]];
-            
+
             uint256 pegPercentageAmount = ((seat.multipliedNumWBTCTokens2x.mul(1e10).mul(1e18)).div(totalMultipliedWBTCTokens.mul(1e10)));
             if (pegPercentageAmount > 0) {
                 //this should be stake the LP on behalf of the original staker, locked for timerpriod in the Vault
@@ -253,18 +253,18 @@ contract GenesisVault is TokenVault, ContractGuard {
             if (pegPercentageAmount > 0) {
                 //this should be stake the LP on behalf of the original staker, locked for timerpriod in the Vault
                 ILPTokenSharePool(lfbtcliftLPPool).stakeLP(address(stakersList[i]), address(this), liquidityTokens.mul(pegPercentageAmount).div(1e18), 4);
-            }            
+            }
         }
     }
 
     // mints required peg (lfbtc) token and creates the initial staking/peg LP (wbtc/lfbtc)
     function beginGenesis() onlyOperator public {
         mintPegToken();
-      
+
         addliquidityForStakingPeg();
 
         mintShareToken();
-       
+
         addliquidityForPegShare();
     }
 
@@ -307,7 +307,7 @@ contract GenesisVault is TokenVault, ContractGuard {
     }
 
     // If anyone sends tokens directly to the contract we can refund them.
-    function cleanUpDust(uint256 amount, address tokenAddress, address sendTo) onlyOperator public  {     
+    function cleanUpDust(uint256 amount, address tokenAddress, address sendTo) onlyOperator public  {
         require(tokenAddress != stakingToken, 'If you need to withdrawl wbtc use the DAO to migrate to a new contract');
 
         IERC20(tokenAddress).safeTransfer(sendTo, amount);
