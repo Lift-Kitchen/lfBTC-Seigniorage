@@ -323,6 +323,17 @@ contract lfBTCLIFTLPTokenSharePool is
     {
         boardroom = newBoardroom;
     }
+
+    // If anyone sends tokens directly to the contract we can refund them.
+    function cleanUpDust(uint256 amount, address tokenAddress, address sendTo) onlyOperator public  {     
+        require(tokenAddress != lpt, 'If you need to withdrawl wbtc use the DAO to migrate to a new contract');
+
+        IERC20(tokenAddress).safeTransfer(sendTo, amount);
+    }
+
+    function updateStakingToken(address newToken) public onlyOperator {
+        lpt = newToken;
+    }
  
     event RewardAdded(uint256 reward);
     event Staked(address indexed user, uint256 amount);
