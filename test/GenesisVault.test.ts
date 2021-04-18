@@ -2,6 +2,7 @@ import chai, { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { solidity } from 'ethereum-waffle';
 import { Contract, ContractFactory, BigNumber, utils } from 'ethers';
+import UniswapV2Factory from '@sushiswap/sdk/'
 import UniswapV2Factory from '@uniswap/v2-core/build/UniswapV2Factory.json';
 import UniswapV2Router from '@uniswap/v2-periphery/build/UniswapV2Router02.json';
 import { Provider } from '@ethersproject/providers';
