@@ -687,7 +687,7 @@
     "@ethersproject/logger" "^5.0.8"
     "@ethersproject/properties" "^5.0.7"
 
-"@ethersproject/address@^5.0.9", "@ethersproject/address@>=5.0.0-beta.128", "@ethersproject/address@5.0.11":
+"@ethersproject/address@^5.0.0-beta", "@ethersproject/address@^5.0.9", "@ethersproject/address@>=5.0.0-beta.128", "@ethersproject/address@5.0.11":
   "integrity" "sha512-Et4GBdD8/tsBGjCEOKee9upN29qjL5kbRcmJifb4Penmiuh9GARXL2/xpXvEp5EW+EIW/rfCHFJrkYBgoQFQBw=="
   "resolved" "https://registry.npmjs.org/@ethersproject/address/-/address-5.0.11.tgz"
   "version" "5.0.11"
@@ -736,7 +736,7 @@
   dependencies:
     "@ethersproject/bignumber" "^5.0.13"
 
-"@ethersproject/contracts@5.0.12":
+"@ethersproject/contracts@^5.0.0-beta", "@ethersproject/contracts@5.0.12":
   "integrity" "sha512-srijy31idjz8bE+gL1I6IRj2H4I9dUwfQ+QroLrIgNdGArqY8y2iFUKa3QTy+JBX26fJsdYiCQi1kKkaNpnMpQ=="
   "resolved" "https://registry.npmjs.org/@ethersproject/contracts/-/contracts-5.0.12.tgz"
   "version" "5.0.12"
@@ -815,7 +815,7 @@
   "resolved" "https://registry.npmjs.org/@ethersproject/logger/-/logger-5.0.10.tgz"
   "version" "5.0.10"
 
-"@ethersproject/networks@^5.0.7", "@ethersproject/networks@5.0.9":
+"@ethersproject/networks@^5.0.0-beta", "@ethersproject/networks@^5.0.7", "@ethersproject/networks@5.0.9":
   "integrity" "sha512-L8+VCQwArBLGkxZb/5Ns/OH/OxP38AcaveXIxhUTq+VWpXYjrObG3E7RDQIKkUx1S1IcQl/UWTz5w4DK0UitJg=="
   "resolved" "https://registry.npmjs.org/@ethersproject/networks/-/networks-5.0.9.tgz"
   "version" "5.0.9"
@@ -837,7 +837,7 @@
   dependencies:
     "@ethersproject/logger" "^5.0.8"
 
-"@ethersproject/providers@^5.0.24", "@ethersproject/providers@5.0.24":
+"@ethersproject/providers@^5.0.0-beta", "@ethersproject/providers@^5.0.24", "@ethersproject/providers@5.0.24":
   "integrity" "sha512-M4Iw1r4gGJkt7ZUa++iREuviKL/DIpmIMsaUlVlXtV+ZrUXeN8xQ3zOTrbz7R4h9W9oljBZM7i4D3Kn1krJ30A=="
   "resolved" "https://registry.npmjs.org/@ethersproject/providers/-/providers-5.0.24.tgz"
   "version" "5.0.24"
@@ -897,7 +897,7 @@
     "@ethersproject/properties" "^5.0.7"
     "elliptic" "6.5.4"
 
-"@ethersproject/solidity@5.0.10":
+"@ethersproject/solidity@^5.0.0-beta", "@ethersproject/solidity@5.0.10":
   "integrity" "sha512-8OG3HLqynWXDA6mVIHuHfF/ojTTwBahON7hc9GAKCqglzXCkVA3OpyxOJXPzjHClRIAUUiU7r9oy9Z/nsjtT/g=="
   "resolved" "https://registry.npmjs.org/@ethersproject/solidity/-/solidity-5.0.10.tgz"
   "version" "5.0.10"
@@ -1582,6 +1582,19 @@
   "integrity" "sha512-DT3f/Aa4tQysZwUsuqBwvr8YRJzKkvPUKV/9o2/o5EVw3xqlbzmtx4O60lTUcZdCawL+N8bBLNUyOGpHjGlJVQ=="
   "resolved" "https://registry.npmjs.org/@solidity-parser/parser/-/parser-0.12.0.tgz"
   "version" "0.12.0"
+
+"@sushiswap/sdk@*":
+  "integrity" "sha512-d/Cy1Sf9tkJ9H0aduLzPUWpPYQpreKXHD+o22mhJi2tbHjLrdrOhPhmrnqpHXJ8zYa4gsvBI86dPLePh4Yx1NA=="
+  "resolved" "https://registry.npmjs.org/@sushiswap/sdk/-/sdk-5.0.0-canary.6.tgz"
+  "version" "5.0.0-canary.6"
+  dependencies:
+    "@uniswap/v2-core" "^1.0.0"
+    "big.js" "^5.2.2"
+    "decimal.js-light" "^2.5.0"
+    "jsbi" "^3.1.1"
+    "tiny-invariant" "^1.1.0"
+    "tiny-warning" "^1.0.3"
+    "toformat" "^2.0.0"
 
 "@szmarczak/http-timer@^1.1.2":
   "integrity" "sha512-XIB2XbzHTN6ieIjfIMV9hlVcfPU26s2vafYWQcZHWXHOxiaRZYEDKEwdl129Zyg50+foYV2jCgtrqSA6qNuNSA=="
