@@ -198,7 +198,7 @@ contract HedgeFund is Operator, ContractGuard {
     }
 
     function accumGrowth() public view returns (uint256) {
-        return (growthRate**(block.timestamp - starttime) / 60 / 60 / 24).div(1e26);
+        return (growthRate**((block.timestamp - starttime) / 60 / 60 / 24)).div(1e26);
     }
 
     // YES this 100% can rug pull the IdeaFund just like every other stablization fund via with a Migrate Function

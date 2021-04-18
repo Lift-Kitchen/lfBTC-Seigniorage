@@ -93,7 +93,7 @@ contract iFARMWrapper {
     }
 }
 
-contract shortStakealUSDPool is iFARMWrapper, IRewardDistributionRecipient {
+contract shortStakeiFARMPool is iFARMWrapper, IRewardDistributionRecipient {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
