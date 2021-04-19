@@ -1,21 +1,15 @@
 # LiftDAO aka Lift.kitchen
 truffle run verify Treasury Boardroom GenesisVault wBTClfBTCLPTokenSharePool lfBTCLIFTLPTokenSharePool Oracle MockLinkOracle IdeaFund MockwBTC lfBTC LIFT CTRL HAIF HedgeFund DevFund shortStakealUSDPool shortStakeiFARMPool shortStakeKBTCPool shortStakeOHMPool --network rinkeby
 
-HedgeFund needs to review
-- decimal place math with the wbtc pair (need to add some multipliers)
-- review the buy and sell function dealing with wbtc.
-- HUGE genesis update to improve GAS usage for the mint/approve/stake functions (must test)
-
 At Launch
+--------------------------------------------------------------------------------------
 - After Genesis - Migrate to Treasury
 - VALIDATE ORACLE BEFORE Moving UniTokens from IdeaFund to HedgeFund
 - Set Staking dates start to one day after the genesis "conversion"
-- WE MIGHT HAVE TO TWEAK OUR ORACLE IF IT ISNT GIVING US WHAT WE WANT!
-- Every contract has an oracle update function!
-
-Need Help:
---------------------------------------------------------------------------------------
-Need to think about what is timelocked out and what is controlled by the DAO
+- Update the UniswapLibrary Hex code
+- Update the migration deployment TimeStamps
+- Update the TIME LOCKS on lfBTCLIFTLPTokenPool
+- Token Tasks:  Each coin needs to be listed on on CoinGecko - https://docs.google.com/forms/d/e/1FAIpQLScIlVCl2qIc9SMPxHZCuZAZkRCxCNZugjNmHZISswAeodlc0A/viewform
 
 Ready for Testing:
 --------------------------------------------------------------------------------------
@@ -82,18 +76,6 @@ hedgefund.sol - 3/18/2021
     - can return a HAIF price to functions
     - HAS A LOT OF OPPORUTNITY FOR IMPROVEMENT
 
-
-ACTIVE TO DO ITEMS
---------------------------------------------------------------------------------------
-Genesis Community / Lift.Kitchen
-- Need to create a whitepaper outlining the below and get it on Medium
-- Need to get the website Finalized
-- Daily Tweets / Medium Update every 3 
-- BUILD Finance channel has a list of defi influencers worth reaching out to all of them...
-- Token Tasks:  Each coin needs to be listed on on CoinGecko - https://docs.google.com/forms/d/e/1FAIpQLScIlVCl2qIc9SMPxHZCuZAZkRCxCNZugjNmHZISswAeodlc0A/viewform
-- Launch Tokens + GenesisVault.sol
-
-
 Extra Credit
 --------------------------------------------------------------------------------------
 if we have time - migrate from UniSwap to SushiSwap Onsen
@@ -110,7 +92,7 @@ PHASE 2 Enhancements
 --------------------------------------------------------------------------------------
 Staking the LPs in BANKVAULT pays us in LIFT (continously) (options for emissions, normal, push to boardroom, lockup in boardroom, convert to more LP)
     - LOOK At Zapper.fi - we need a one click staking capability from any Token into either LP from the website
-    - Issue 20k/week - Can be redeemed immediately at a 60% reduction, or can one button click into Boardroom (no reduction), dropium method in boardroom over 60 days - meaning if I withdraw immediately I lose 60%, a day later 59% - This is measured each time the individual moves their emmissions into boardroom or withdraws
+    - Issue 10k/week - Can be redeemed immediately at a 90% reduction, or can one button click into Boardroom (no reduction), dropium method in boardroom over 90 days - meaning if I withdraw immediately I lose 90%, a day later 89% - This is measured each time the individual moves their emmissions into boardroom or withdraws
     - what ever % of LIFT a person abandons by early redemptions will be transferred to the IdeaFund for selling no penalty
     - This code is the LP / Distribution / Distributors / Vault / Strategies
 
