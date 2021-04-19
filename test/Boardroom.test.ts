@@ -131,9 +131,7 @@ describe('Boardroom', () => {
             haifToken.address,
             hedgeFund.address,
             ideaFund.address,
-            mockLinkOracle.address,
-            period,
-            startTime
+            mockLinkOracle.address
         );
 
         boardroom = await boardroomFactory.deploy(
@@ -375,7 +373,6 @@ describe('Boardroom', () => {
                 await ctrlToken.mint(operator.address, amountToAllocate.mul(2));
                 await ctrlToken.connect(operator).approve(boardroom.address, amountToAllocate);
 
-                await mockOracle.initialize();
                 await expect(boardroom.allocateSeigniorage(amountToAllocate))
                     .to.emit(boardroom, "RewardAdded")
                     .withArgs(operator.address, amountToAllocate);
@@ -396,7 +393,6 @@ describe('Boardroom', () => {
                 await ctrlToken.mint(operator.address, amountToAllocate.mul(2));
                 await ctrlToken.connect(operator).approve(boardroom.address, amountToAllocate);
 
-                await mockOracle.initialize();
                 await boardroom.connect(operator).allocateSeigniorage(amountToAllocate);
 
                 [shareAwardEarned, ctrlAwardEarned] = await boardroom.earned(addr1.address);
@@ -421,7 +417,6 @@ describe('Boardroom', () => {
                 await ctrlToken.mint(operator.address, amountToAllocate.mul(2));
                 await ctrlToken.connect(operator).approve(boardroom.address, amountToAllocate);
 
-                await mockOracle.initialize();
                 await expect(boardroom.allocateSeigniorage(amountToAllocate))
                     .to.emit(boardroom, "RewardAdded")
                     .withArgs(operator.address, amountToAllocate);
@@ -448,7 +443,6 @@ describe('Boardroom', () => {
                 await ctrlToken.mint(operator.address, amountToAllocate.mul(2));
                 await ctrlToken.connect(operator).approve(boardroom.address, amountToAllocate);
 
-                await mockOracle.initialize();
                 await boardroom.connect(operator).allocateSeigniorage(amountToAllocate);
 
                 [shareAwardEarned, ctrlAwardEarned] = await boardroom.earned(addr1.address);
@@ -479,7 +473,6 @@ describe('Boardroom', () => {
                 await ctrlToken.mint(operator.address, amountToAllocate);
                 await ctrlToken.connect(operator).approve(boardroom.address, amountToAllocate);
 
-                await mockOracle.initialize();
                 await boardroom.connect(operator).allocateSeigniorage(amountToAllocate);
 
                 [shareAwardEarned, ctrlAwardEarned] = await boardroom.earned(addr1.address);

@@ -169,9 +169,7 @@ describe('GenesisVault', () => {
             haifToken.address,
             hedgeFund.address,
             ideaFund.address,
-            mockLinkOracle.address,
-            period,
-            startTime
+            mockLinkOracle.address
         );
 
         boardroom = await boardroomFactory.deploy(
@@ -186,7 +184,7 @@ describe('GenesisVault', () => {
         lfBTCLIFTLPTokenSharePool = await lfBTCLIFTLPTokenSharePoolFactory.deploy(
             boardroom.address,
             liftToken.address,
-            mockLPToken.address,
+            lpToken,
             startTime
         );
 
@@ -220,31 +218,13 @@ describe('GenesisVault', () => {
                 expect(await genesisVault.balanceOf(operator.address)).to.be.eq(0);
             });
 
-            it('should be able to set terminated', async () => {
-                await genesisVault.terminateStaking();
-                expect(await genesisVault.terminated()).to.be.true;
-            });
-
-            // it('should not allow beginGenesis until terminated', async () => {
-            //     await expect(genesisVault.beginGenesis()).to.be.revertedWith(
-            //         "VM Exception while processing transaction: revert You must terminate before executing genesis"
-            //     );
-            // });
-
-            it('should not begin genesis without a stakingToken balance', async () => {
-                await genesisVault.terminateStaking();
-                await expect(genesisVault.beginGenesis()).to.be.revertedWith(
-                    "VM Exception while processing transaction: revert No stakingToken to begin genesis"
-                );
-            });
-
             it('should stake correctly', async () => {
                 const amountToStake = ETH.mul(1000);
 
                 await mockwBTCToken.mint(addr1.address, amountToStake);
                 await mockwBTCToken.connect(addr1).approve(genesisVault.address, amountToStake);
 
-                await genesisVault.connect(addr1).stake(amountToStake);
+                await genesisVault.connect(addr1).stake(amountToStake, 1);
 
                 expect(await genesisVault.totalSupply(), "totalSupply should have increased by amountToStake").to.be.eq(amountToStake);
                 expect(await genesisVault.balanceOf(addr1.address), "staker should have balance of amountToStake").to.be.eq(amountToStake);
@@ -262,24 +242,20 @@ describe('GenesisVault', () => {
             it('Can do genesis', async () => {
                 const amountToStake = BigNumber.from(2221500000);
 
-                console.log(lpToken);
-
                 await mockwBTCToken.mint(addr2.address, amountToStake.div(2));
                 await mockwBTCToken.connect(addr2).approve(genesisVault.address, amountToStake.div(2));
-                await genesisVault.connect(addr2).stake(amountToStake.div(2));
+                await genesisVault.connect(addr2).stake(amountToStake.div(2), 1);
 
                 await mockwBTCToken.mint(addr3.address, amountToStake.div(5));
                 await mockwBTCToken.connect(addr3).approve(genesisVault.address, amountToStake.div(5));
-                await genesisVault.connect(addr3).stake(amountToStake.div(5));
+                await genesisVault.connect(addr3).stake(amountToStake.div(5), 3);
 
                 await mockwBTCToken.mint(addr1.address, amountToStake);
                 await mockwBTCToken.connect(addr1).approve(genesisVault.address, amountToStake);
-                await genesisVault.connect(addr1).stake(amountToStake);
+                await genesisVault.connect(addr1).stake(amountToStake, 4);
 
                 await lfBTCToken.connect(operator).transferOperator(genesisVault.address);
                 await liftToken.connect(operator).transferOperator(genesisVault.address);
-                await oracle.connect(operator).transferOperator(genesisVault.address);
-
                 
                 await genesisVault.beginGenesis();
             });

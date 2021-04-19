@@ -130,8 +130,6 @@ contract HedgeFund is Operator, ContractGuard {
                     'HedgeFund: Send a token we can work with!');
             require(amount <= IERC20(tokentoDeposit).allowance(msg.sender, address(this)), 'HedgeFund: not approved to spend token');
 
-            IOracle(theOracle).update();
-
             IERC20(tokentoDeposit).transferFrom(msg.sender, address(this), amount);
             uint256 mintedHedge = 0;
 
@@ -190,7 +188,8 @@ contract HedgeFund is Operator, ContractGuard {
 
     function hedgePrice() public view returns (uint256) {
             uint daysSinceStart = (block.timestamp - starttime) / 60 / 60 / 24;
-            return startingValue.mul((growthRate**daysSinceStart).div(1e26)).div(100);
+            console.log(startingValue.mul(growthRate**daysSinceStart).div(1e36));
+            return startingValue.mul((growthRate**daysSinceStart)).div(1e36);
     }
 
     function hedgeDaysSinceStart() public view returns (uint256) {
@@ -198,7 +197,7 @@ contract HedgeFund is Operator, ContractGuard {
     }
 
     function accumGrowth() public view returns (uint256) {
-        return (growthRate**((block.timestamp - starttime) / 60 / 60 / 24)).div(1e26);
+        return (growthRate**((block.timestamp - starttime) / 60 / 60 / 24));
     }
 
     // YES this 100% can rug pull the IdeaFund just like every other stablization fund via with a Migrate Function

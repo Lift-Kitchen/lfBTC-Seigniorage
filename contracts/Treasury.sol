@@ -131,11 +131,6 @@ contract Treasury is Operator, ContractGuard, Epoch {
         return IOracle(theOracle).wbtcPriceOne().mul(pegPriceCeiling).div(100);
     }
 
-    /* ========== MUTABLE FUNCTIONS ========== */
-    function _updatePegPrice() internal {
-        try IOracle(theOracle).update() {} catch {}
-    }   
-
     function mintControlForIdeaFund(address sendingTo, uint256 amount) external {
         require(msg.sender == ideafund, 'Treasury: You cant call this!');
         IBasisAsset(control).mint(sendingTo, amount);
@@ -154,7 +149,6 @@ contract Treasury is Operator, ContractGuard, Epoch {
         checkEpoch
         checkOperator
     {
-        _updatePegPrice();
         uint256 pegPrice = IOracle(theOracle).priceOf(peg);
 
         if (pegPrice <= getPegPriceCeiling()) {

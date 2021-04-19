@@ -266,8 +266,6 @@ contract GenesisVault is TokenVault, ContractGuard {
         mintShareToken();
        
         addliquidityForPegShare();
-
-        IOracle(theOracle).initialize();
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
@@ -297,10 +295,6 @@ contract GenesisVault is TokenVault, ContractGuard {
         Operator(share).transferOperator(target);
         Operator(share).transferOwnership(target);
         IERC20(share).transfer(target, IERC20(share).balanceOf(address(this)));
-
-        Operator(theOracle).transferOperator(target);
-        Operator(theOracle).transferOwnership(target);
-        //IERC20(share).transfer(target, IERC20(share).balanceOf(address(this)));
 
         // wbtc
         IERC20(stakingToken).transfer(target, IERC20(stakingToken).balanceOf(address(this)));

@@ -398,8 +398,6 @@ contract Boardroom is ShareWrapper, ContractGuard, Operator {
         if(gettotalSupplyShare() == 0 && gettotalSupplyControl() == 0)
             return;
 
-        IOracle(theOracle).update();
-
         uint256 shareValue = gettotalSupplyShare().mul(IOracle(theOracle).priceOf(share));
         uint256 controlValue = gettotalSupplyControl().mul(IOracle(theOracle).priceOf(control));
 

@@ -34,9 +34,7 @@ contract MockOracle is IOracle {
         address _hedge, // haif
         address _hedgefund,
         address _ideafund,
-        ILinkOracle _linkOracle,
-        uint256 _period,
-        uint256 _startTime
+        ILinkOracle _linkOracle
     ) {
         factory = _factory;
         peg = _peg;
@@ -47,11 +45,6 @@ contract MockOracle is IOracle {
         hedgefund = _hedgefund;
         ideafund = _ideafund;
         linkOracle = _linkOracle;
-        period = _period;
-        startTime = _startTime;
-    }
-
-    function initialize() external override {
     }
 
     function setPrice(uint256 _price) public {
@@ -60,11 +53,6 @@ contract MockOracle is IOracle {
 
     function setRevert(bool _error) public {
         error = _error;
-    }
-
-    function update() external override {
-        require(!error, 'Oracle: mocked error');
-        emit Updated(0, 0);
     }
 
     function priceOf(address token) external override view returns (uint256 priceOfToken)
@@ -89,8 +77,6 @@ contract MockOracle is IOracle {
     {
         return uint256(57800e18);
     }
-
-    event Updated(uint256 price0CumulativeLast, uint256 price1CumulativeLast);
 
     function pairFor(address _factory, address _token1, address _token2) external override view returns (address pairaddy)
     {

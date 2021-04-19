@@ -143,9 +143,7 @@ describe('Treasury', () => {
             haifToken.address,
             hedgeFund.address,
             ideaFund.address,
-            mockLinkOracle.address,
-            period,
-            startTime
+            mockLinkOracle.address
         );
 
         hedgeFund.updateOracle(mockOracle.address);

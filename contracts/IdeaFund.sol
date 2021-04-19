@@ -92,8 +92,6 @@ contract IdeaFund is Operator, ContractGuard {
         require(amount > 0, 'Idea Fund: cannot sell you zero ctrl');
         require(IERC20(token).allowance(msg.sender, address(this)) >= amount, 'Idea Fund: You have not approved the transfer of your token to Idea Fund');
         
-        IOracle(theOracle).update();
-        
         uint256 valueofToken = 0;
         if(token == peg){
             valueofToken = amount.mul(IOracle(theOracle).priceOf(peg));
@@ -157,8 +155,6 @@ contract IdeaFund is Operator, ContractGuard {
     {
         require(numTokens > 0, 'Idea Fund: cannot purchase tokenA with zero amount');
         require(IERC20(tokenB).balanceOf(address(this)) >= numTokens, 'Idea Fund: we dont have that many tokens to trade fool!');
-
-        IOracle(theOracle).update();
 
         address[] memory pathTo;
         IERC20(tokenB).approve(address(router), numTokens);

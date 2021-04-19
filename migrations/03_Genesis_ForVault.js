@@ -1,10 +1,9 @@
 const contract = require('@truffle/contract');
 
 const POOL_START_DATE     = 1618018953; //1619888400; // 05/01/2021 @ 1:00pm (EST)
-const ORACLE_START_DATE   = 1618018953; //1619283600; // 04/20/2021 @ 2:00pm (EST)
 const TREASURY_START_DATE = 1618018953; //1619888400; // 05/01/2021 @ 1:00pm (EST)
 const GENESIS_START_DATE = 1618018953;  //1619283600; // 04/24/2021 @ 1pm EST
-const HEDGEFUND_START_DATE = 1618018953; //1619888400; // 04/20/2021 @ 2:00pm (EST)
+const HEDGEFUND_START_DATE = 1618018953; //1619888400; // 05/01/2021 @ 1:00pm (EST)
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000';
 const knownContracts = require('./known-contracts');
 
@@ -76,8 +75,8 @@ async function migration(deployer, network, accounts) {
     const ideafund = await deployer.deploy(IdeaFund, wbtc.address, peg.address, share.address, control.address, hedge.address, HedgeFund.address, uniswapRouter.address);
 
     // Deploy Oracle
-    const oracle = await deployer.deploy(Oracle, uniswap.address, wbtc.address, peg.address, share.address, control.address, hedge.address, HedgeFund.address, IdeaFund.address, linkOracle.address, DAY, ORACLE_START_DATE);
-    //await oracle.initialize();
+    const oracle = await deployer.deploy(Oracle, uniswap.address, wbtc.address, peg.address, share.address, control.address, hedge.address, HedgeFund.address, IdeaFund.address, linkOracle.address);
+    
     await hedgefund.updateOracle(Oracle.address);
     await ideafund.updateOracle(Oracle.address);
 

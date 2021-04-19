@@ -34,7 +34,7 @@ module.exports = async (deployer, network, accounts) => {
    const sharepool = await lfbtcliftLPPool.deployed();
 
 
-   for await (const contract of [ peg, share, oracle ]) {
+   for await (const contract of [ peg, share ]) {
      await contract.transferOperator(genesisvault.address);
      await contract.transferOwnership(genesisvault.address);
    }

@@ -161,9 +161,7 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
             haifToken.address,
             hedgeFund.address,
             ideaFund.address,
-            mockLinkOracle.address,
-            period,
-            startTime
+            mockLinkOracle.address
         );
 
         boardroom = await boardroomFactory.deploy(
@@ -226,18 +224,11 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
                 await mockLPToken.mint(operator.address, amountToStake);
                 await mockLPToken.approve(lfBTCLIFTLPTokenSharePool.address, amountToStake);
 
-                await expect(lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, true))
+                await expect(lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, 2))
                      .to.emit(lfBTCLIFTLPTokenSharePool, "Staked")
                      .withArgs(addr1.address, amountToStake);
 
                 expect(await mockLPToken.balanceOf(lfBTCLIFTLPTokenSharePool.address)).to.be.eq(amountToStake);
-            });
-
-            it('should not allow withdrawing lpt of 0 amount', async () => {
-                await expect(lfBTCLIFTLPTokenSharePool.connect(addr1).withdraw(0))
-                    .to.be.revertedWith(
-                        "VM Exception while processing transaction: revert lfBTCLIFTLPTokenSharePool: Cannot withdraw 0"
-                    );
             });
 
             it('should not allow withdrawing more lpt than staked ', async () => {
@@ -291,7 +282,7 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
                 await mockLPToken.mint(operator.address, amountToStake);
                 await mockLPToken.approve(lfBTCLIFTLPTokenSharePool.address, amountToStake);
 
-                await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, true);
+                await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, 1);
 
                 await expect(lfBTCLIFTLPTokenSharePool.connect(addr1).withdraw(amountToStake))
                     .to.be.revertedWith(
@@ -311,7 +302,7 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
                 await mockLPToken.mint(operator.address, amountToStake);
                 await mockLPToken.approve(lfBTCLIFTLPTokenSharePool.address, amountToStake);
 
-                await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, true);
+                await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, 2);
 
                 const daysToWait = 7;
                 await advanceTimeAndBlock(

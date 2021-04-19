@@ -25,7 +25,7 @@ async function latestBlocktime(provider: Provider): Promise<number> {
 describe('IdeaFund', () => {
     const { provider } = ethers;
     const period = 0;
-    const startTime = 0;
+    const startTime = 1618018953;
 
     let lfBTCTokenFactory: ContractFactory;
     let liftTokenFactory: ContractFactory;
@@ -149,9 +149,7 @@ describe('IdeaFund', () => {
             haifToken.address,
             hedgeFund.address,
             ideaFund.address,
-            mockLinkOracle.address,
-            period,
-            startTime
+            mockLinkOracle.address
         );
 
         hedgeFund.updateOracle(mockOracle.address);
@@ -310,9 +308,11 @@ describe('IdeaFund', () => {
                     .withArgs(ideaFund.address, amountToInvest);
 
                 expect(await lfBTCToken.balanceOf(ideaFund.address)).to.be.eq(amountToInvest);
-                expect(await haifToken.balanceOf(ideaFund.address)).to.be.gt(0);
+
+                expect(await haifToken.balanceOf(hedgeFund.address)).to.be.eq(0);
 
                 expect(await lfBTCToken.balanceOf(hedgeFund.address)).to.be.eq(amountToInvest);
+           
                 expect(await haifToken.balanceOf(ideaFund.address)).to.be.gt(0);
             });
         });
