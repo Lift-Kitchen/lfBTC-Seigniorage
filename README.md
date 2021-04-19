@@ -1,5 +1,5 @@
 # LiftDAO aka Lift.kitchen
-truffle run verify Treasury Boardroom GenesisVault wBTClfBTCLPTokenSharePool lfBTCLIFTLPTokenSharePool Oracle MockLinkOracle IdeaFund MockwBTC lfBTC LIFT CTRL HAIF HedgeFund DevFund --network rinkeby
+truffle run verify Treasury Boardroom GenesisVault wBTClfBTCLPTokenSharePool lfBTCLIFTLPTokenSharePool Oracle MockLinkOracle IdeaFund MockwBTC lfBTC LIFT CTRL HAIF HedgeFund DevFund shortStakealUSDPool shortStakeiFARMPool shortStakeKBTCPool shortStakeOHMPool --network rinkeby
 
 HedgeFund needs to review
 - decimal place math with the wbtc pair (need to add some multipliers)

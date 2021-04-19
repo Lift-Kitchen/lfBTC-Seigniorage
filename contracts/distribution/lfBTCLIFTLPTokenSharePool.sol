@@ -196,6 +196,7 @@ contract lfBTCLIFTLPTokenSharePool is
         emit Staked(staker, amount);
     }
 
+    //we are ignoring the amount.  
     function withdraw(uint256 amount)
         public
         override

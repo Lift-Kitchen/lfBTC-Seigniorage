@@ -143,6 +143,7 @@ contract Treasury is Operator, ContractGuard, Epoch {
 
     function allocateSeigniorage()
         external
+        onlyOperator
         onlyOneBlock
         checkMigration
         checkStartTime

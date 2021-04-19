@@ -172,13 +172,13 @@ contract HedgeFund is Operator, ContractGuard {
     function withdrawFromHedgeFund(uint256 amount) external hasOracle hasLPPoolValues returns (uint256 removedHaifAmount) {
 
             require(_haifBalances[msg.sender] >= amount, 'HedgeFund: You dont have this amount invested');
-            require(IERC20(storedvalueToken).balanceOf(address(this)).mul(IOracle(theOracle).wbtcPriceOne()) >= amount.mul(hedgePrice()), 'HedgeFund: We dont have enough wbtc to pay you out currently please check back in 24 hours');
+            require(IERC20(storedvalueToken).balanceOf(address(this)).mul(1e10).mul(IOracle(theOracle).wbtcPriceOne()) >= amount.mul(hedgePrice()), 'HedgeFund: We dont have enough wbtc to pay you out currently please check back in 24 hours');
             require(amount <= IERC20(hedge).allowance(msg.sender, address(this)), 'HedgeFund: You must approve the haif amount before calling');
 
             _haifBalances[msg.sender] -= amount;
             IBasisAsset(hedge).burnFrom(msg.sender,amount);
 
-            uint256 transferAmount = amount.mul(hedgePrice()).div(IOracle(theOracle).wbtcPriceOne());
+            uint256 transferAmount = amount.mul(hedgePrice()).div(IOracle(theOracle).wbtcPriceOne()).div(1e10);
             IERC20(storedvalueToken).transfer(msg.sender, transferAmount);
             
             emit WithDrawFromHedgeFund(msg.sender, amount);
