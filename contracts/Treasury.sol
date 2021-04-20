@@ -5,13 +5,13 @@ import '@openzeppelin/contracts/math/Math.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
-import 'hardhat/console.sol';
+//import 'hardhat/console.sol';
 
 import './interfaces/IOracle.sol';
 import './interfaces/IBoardroom.sol';
-import './interfaces/IIdeaFund.sol';
 import './interfaces/IBasisAsset.sol';
-import './interfaces/ISimpleERCFund.sol';
+//import './interfaces/ISimpleERCFund.sol';
+//import './interfaces/IIdeaFund.sol';
 import './lib/Babylonian.sol';
 import './lib/FixedPoint.sol';
 

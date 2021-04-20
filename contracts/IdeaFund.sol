@@ -9,7 +9,7 @@ import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import './interfaces/IUniswapV2Pair.sol';
 import './interfaces/IUniswapV2Router02.sol';
 import './interfaces/IOracle.sol';
-import './interfaces/IBasisAsset.sol';
+//import './interfaces/IBasisAsset.sol';
 import './interfaces/ITreasury.sol';
 import './interfaces/IHedgeFund.sol';
 
@@ -21,7 +21,7 @@ import './utils/Operator.sol';
 import './utils/Epoch.sol';
 import './utils/ContractGuard.sol';
 
-import 'hardhat/console.sol';
+//import 'hardhat/console.sol';
 
 contract IdeaFund is Operator, ContractGuard {
     using SafeERC20 for IERC20;

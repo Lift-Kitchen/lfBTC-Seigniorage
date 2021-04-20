@@ -38,7 +38,7 @@ import './interfaces/IUniswapV2Router02.sol';
 import './interfaces/IOracle.sol';
 import './interfaces/IBasisAsset.sol';
 import './interfaces/ISimpleERCFund.sol';
-import './interfaces/IHedgeFund.sol';
+//import './interfaces/IHedgeFund.sol';
 
 import './lib/UniswapV2Library.sol';
 import './lib/Babylonian.sol';
@@ -48,7 +48,7 @@ import './utils/Operator.sol';
 import './utils/Epoch.sol';
 import './utils/ContractGuard.sol';
 
-import 'hardhat/console.sol';
+//import 'hardhat/console.sol';
 
 contract HedgeFund is Operator, ContractGuard {
     using SafeERC20 for IERC20;
@@ -188,7 +188,7 @@ contract HedgeFund is Operator, ContractGuard {
 
     function hedgePrice() public view returns (uint256) {
             uint daysSinceStart = (block.timestamp - starttime) / 60 / 60 / 24;
-            console.log(startingValue.mul(growthRate**daysSinceStart).div(1e36));
+            //console.log(startingValue.mul(growthRate**daysSinceStart).div(1e36));
             return startingValue.mul((growthRate**daysSinceStart)).div(1e36);
     }
 
