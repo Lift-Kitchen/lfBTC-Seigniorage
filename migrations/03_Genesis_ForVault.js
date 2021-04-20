@@ -8,6 +8,7 @@ const ZERO_ADDR = '0x0000000000000000000000000000000000000000';
 const knownContracts = require('./known-contracts');
 
 const MockwBTC = artifacts.require('MockwBTC');
+
 const Peg = artifacts.require('LFBTC');
 const Share = artifacts.require('LIFT');
 const Control = artifacts.require('CTRL');
@@ -64,8 +65,8 @@ async function migration(deployer, network, accounts) {
     const share = await Share.deployed();
     const control = await Control.deployed();
     const hedge = await Hedge.deployed();
-
-    // Deploy DevFund
+    
+        // Deploy DevFund
     await deployer.deploy(DevFund)
 
     // Deploy HedgeFund
@@ -101,17 +102,20 @@ async function migration(deployer, network, accounts) {
     await deployer.deploy(wBTClfBTCLPPool, Boardroom.address, share.address, wbtcpegPair, POOL_START_DATE);
     await deployer.deploy(lfbtcliftLPPool, Boardroom.address, share.address, pegsharePair, POOL_START_DATE);
 
+  const MockERC20 = artifacts.require('MockERC20');
+  const mockerc20 = await MockERC20.deployed();
+
     const alUSD = "0xbc6da0fe9ad5f3b0d58160288917aa56653660e9";
-    await deployer.deploy(singlePoolalUSD, share.address, alUSD, POOL_START_DATE);
+    await deployer.deploy(singlePoolalUSD, share.address, mockerc20.address, POOL_START_DATE);
 
     const iFARM = "0x1571ed0bed4d987fe2b498ddbae7dfa19519f651";
-    await deployer.deploy(singlePooliFARM, share.address, iFARM, POOL_START_DATE);
+    await deployer.deploy(singlePooliFARM, share.address, mockerc20.address, POOL_START_DATE);
 
     const KBTC = "0xe6c3502997f97f9bde34cb165fbce191065e068f";
-    await deployer.deploy(singlePoolKBTC, share.address, KBTC, POOL_START_DATE);
+    await deployer.deploy(singlePoolKBTC, share.address, mockerc20.address, POOL_START_DATE);
     
     const OHM = "0x383518188c0c6d7730d91b2c03a03c837814a899";
-    await deployer.deploy(singlePoolOHM, share.address, OHM, POOL_START_DATE);
+    await deployer.deploy(singlePoolOHM, share.address, mockerc20.address, POOL_START_DATE);
     
     //constructor(address _theOracle, address _peg, address _share, address _stakingToken, address _lfbtcliftLPPool, address _router, address _ideaFund) {
     await deployer.deploy(GenesisVault, Oracle.address, peg.address, share.address, wbtc.address, lfbtcliftLPPool.address, uniswapRouter.address, ideafund.address, GENESIS_START_DATE);

@@ -89,9 +89,9 @@ contract Oracle {
         } else if (token == share) {
             return priceFromPair(pairPegtoShare);
         } else if (token == control) {
-            IIdeaFund(ideafund).getControlPrice();
+            return IIdeaFund(ideafund).getControlPrice();
         } else if(token == hedge) {
-            IHedgeFund(hedgefund).hedgePrice();
+            return IHedgeFund(hedgefund).hedgePrice();
         } else if(token == staking) {
             return uint256(linkOracle.latestAnswer() * 1e10);
         }

@@ -7,7 +7,7 @@ import '@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol';
 
 import '../utils/Operator.sol';
 
-contract MockalUSD is ERC20Burnable, Operator {
+contract MockERC20 is ERC20Burnable, Operator {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -16,7 +16,7 @@ contract MockalUSD is ERC20Burnable, Operator {
     /**
      * @notice Constructs the Mock wBTC token for testing ERC-20 contract.
      */
-    constructor() ERC20('alUSD', 'alUSD') {
+    constructor() ERC20('MockERC20', 'MockERC20') {
         _mint(msg.sender, MINT_AMOUNT);
         _setupDecimals(8);
     }
