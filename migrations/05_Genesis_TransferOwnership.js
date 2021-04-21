@@ -39,9 +39,6 @@ module.exports = async (deployer, network, accounts) => {
      await contract.transferOwnership(genesisvault.address);
    }
 
-   await control.transferOperator(treasury.address);
-   await control.transferOwnership(treasury.address);
-
    await hedge.transferOperator(hedgefund.address);
    await hedge.transferOwnership(hedgefund.address);
 
