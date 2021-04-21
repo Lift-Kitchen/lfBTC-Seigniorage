@@ -214,11 +214,15 @@ contract IdeaFund is Operator, ContractGuard {
     /* ========== Operator ========== */
     function setRedemptions(address _treasury, bool isredeemable) external onlyOperator {
         _isctrlRedeemable = isredeemable;
-        treasury = _treasury;
     }
 
     function updateOracle(address newOracle) public onlyOperator {
         theOracle = newOracle;
+    }
+
+    function updateAddresses(address newTreasury, address newHedgeFund) public onlyOperator {
+        treasury = newTreasury;
+        hedgefund = newHedgeFund;
     }
 
     function setvariableReduction(uint256 newReduction) public onlyOperator {

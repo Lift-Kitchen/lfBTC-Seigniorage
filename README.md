@@ -1,5 +1,5 @@
 # LiftDAO aka Lift.kitchen
-truffle run verify Treasury Boardroom GenesisVault wBTClfBTCLPTokenSharePool lfBTCLIFTLPTokenSharePool Oracle MockLinkOracle IdeaFund MockwBTC lfBTC LIFT CTRL HAIF HedgeFund DevFund shortStakealUSDPool shortStakeiFARMPool shortStakeKBTCPool shortStakeOHMPool --network rinkeby
+truffle run verify Treasury Boardroom GenesisVault wBTClfBTCLPTokenSharePool lfBTCLIFTLPTokenSharePool Oracle MockLinkOracle IdeaFund MockwBTC MockERC20 lfBTC LIFT CTRL HAIF HedgeFund DevFund shortStakealUSDPool shortStakeiFARMPool shortStakeKBTCPool shortStakeOHMPool --network rinkeby
 
 Genesis Steps
 --------------------------------------------------------------------------------------
