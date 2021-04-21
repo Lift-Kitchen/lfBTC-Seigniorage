@@ -1,6 +1,25 @@
 # LiftDAO aka Lift.kitchen
 truffle run verify Treasury Boardroom GenesisVault wBTClfBTCLPTokenSharePool lfBTCLIFTLPTokenSharePool Oracle MockLinkOracle IdeaFund MockwBTC lfBTC LIFT CTRL HAIF HedgeFund DevFund shortStakealUSDPool shortStakeiFARMPool shortStakeKBTCPool shortStakeOHMPool --network rinkeby
 
+Genesis Steps
+--------------------------------------------------------------------------------------
+Execute Begin Genesis
+- Individual LPs will be auto staked into lfBTC/LIFT Pool
+- Validate Oracle Pricing Contract
+- Migrate GenesisVault to DeployerWallet
+    - Mint LIFT needed for 4 Single Stake Pools (2% APY a day - .5% APY per pool per day)
+    - Migrate LFBTC/LIFT operator/ownership to Treasury Contract
+- IdeaFund will be holding wBTC/lfBTC tokens
+    - Transfer LP tokens to HedgeFund
+    - Transfer LP tokens to HedgeFund wallet
+    - Deconstruct LP 50% 
+        - 50% of total exchanged wbtc is paired in LP
+        - 50% of total exchanged wbtc is turned into wbtc/lftbt tokens
+        - Wallet stakes LP tokens into wbtc/lfbtc pool 
+        - Wallet sends wbtc and lfbtc single tokens back to IdeaFund
+
+
+
 At Launch
 --------------------------------------------------------------------------------------
 - After Genesis - Migrate to Treasury

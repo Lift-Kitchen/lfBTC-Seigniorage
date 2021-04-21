@@ -11,14 +11,14 @@ contract MockERC20 is ERC20Burnable, Operator {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    uint256 constant MINT_AMOUNT = 1000 * 10**18;
+    uint256 constant MINT_AMOUNT = 100 * 10**18;
 
     /**
      * @notice Constructs the Mock wBTC token for testing ERC-20 contract.
      */
     constructor() ERC20('MockERC20', 'MockERC20') {
         _mint(msg.sender, MINT_AMOUNT);
-        _setupDecimals(8);
+        _setupDecimals(18);
     }
 
     /**

@@ -76,7 +76,7 @@ contract IdeaFund is Operator, ContractGuard {
 
         //calculate value   
         //TODO Math update based on 10 digits     
-        return _haifSupply.mul(IOracle(theOracle).priceOf(hedge)).div(2) + IERC20(wbtc).balanceOf(address(this)).mul(1e10).mul(IOracle(theOracle).wbtcPriceOne()).div(variableReduction).div(IERC20(control).totalSupply());
+        return (_haifSupply.mul(IOracle(theOracle).priceOf(hedge)).div(2) + IERC20(wbtc).balanceOf(address(this)).mul(1e10).mul(IOracle(theOracle).wbtcPriceOne())).div(variableReduction).div(IERC20(control).totalSupply());
     }
 
     /* ==== CTRL BUY and SELL ====== */

@@ -289,15 +289,18 @@ contract GenesisVault is TokenVault, ContractGuard {
         // lfbtc
         Operator(peg).transferOperator(target);
         Operator(peg).transferOwnership(target);
-        IERC20(peg).transfer(target, IERC20(peg).balanceOf(address(this)));
+        if (IERC20(peg).balanceOf(address(this)) > 0)
+            IERC20(peg).transfer(target, IERC20(peg).balanceOf(address(this)));
 
         // lift
         Operator(share).transferOperator(target);
         Operator(share).transferOwnership(target);
-        IERC20(share).transfer(target, IERC20(share).balanceOf(address(this)));
+        if (IERC20(share).balanceOf(address(this)) > 0)
+            IERC20(share).transfer(target, IERC20(share).balanceOf(address(this)));
 
         // wbtc
-        IERC20(stakingToken).transfer(target, IERC20(stakingToken).balanceOf(address(this)));
+        if (IERC20(stakingToken).balanceOf(address(this)) > 0)
+            IERC20(stakingToken).transfer(target, IERC20(stakingToken).balanceOf(address(this)));
 
         migrated = true;
         emit Migration(target);

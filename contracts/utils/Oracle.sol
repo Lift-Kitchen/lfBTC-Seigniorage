@@ -105,15 +105,11 @@ contract Oracle {
         (token0Supply, token1Supply, ) = pair.getReserves();
 
         if (pair.token0() == staking) {
-            token0Supply = token0Supply.mul(1e10);
-            
-            token0Supply = token0Supply.mul(1e8);
-            
+            token0Supply = token0Supply.mul(1e18);
+                     
             return token0Supply.div(token1Supply).mul(_priceOf(pair.token0())).div(1e8);
         } else if (pair.token1() == staking) {
-            token1Supply = token1Supply.mul(1e10);
-
-            token1Supply = token1Supply.mul(1e8);
+            token1Supply = token1Supply.mul(1e18);
 
             return token1Supply.div(token0Supply).mul(_priceOf(pair.token1())).div(1e8);
 

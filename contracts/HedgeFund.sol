@@ -67,7 +67,6 @@ contract HedgeFund is Operator, ContractGuard {
     //validate this is 500
     uint public startingValue = 500e18;
     uint256 public starttime;
-    uint256 public haifValue;
 
     mapping(address => uint256) private _haifBalances;
 
@@ -146,15 +145,21 @@ contract HedgeFund is Operator, ContractGuard {
 
                 (token0Supply, token1Supply, ) = pair.getReserves();
 
+                // 8 to 18 converter
+                uint256 extraDiv = 1;
                 if (pair.token0() == storedvalueToken) {
                     token0Supply = token0Supply.mul(1e10);
+                    extraDiv = 1e5;
+                } else if (pair.token1() == storedvalueToken) {
+                    token1Supply = token1Supply.mul(1e10);
+                    extraDiv = 1e5;
                 }
 
                 //pair.token1().decimals()
                 // this should arrive at the value of the pairing...
                 // when testing this in rinkeby we need to see if it discounts the lfBTC price to 0 and only returns tlv of wbtc
                 // TODO Need to check decimals on token to determine if a multiplier is needed.
-                uint256 tokenPrice = (uint256(token0Supply).mul(IOracle(theOracle).priceOf(pair.token0())) + uint256(token1Supply).mul(IOracle(theOracle).priceOf(pair.token1()))).div(pair.totalSupply());
+                uint256 tokenPrice = (uint256(token0Supply).mul(IOracle(theOracle).priceOf(pair.token0())) + uint256(token1Supply).mul(IOracle(theOracle).priceOf(pair.token1()))).div(pair.totalSupply()).div(extraDiv);
 
                 mintedHedge = amount.mul(tokenPrice).div(hedgePrice());
             }
