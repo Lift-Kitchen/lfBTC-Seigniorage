@@ -68,7 +68,7 @@ contract bDIGGWrapper {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    //0x383518188c0c6d7730d91b2c03a03c837814a899
+    //0x7e7e112a68d8d2e221e11047a72ffc1065c38e1a
     IERC20 public bDIGG;
 
     uint256 private _totalSupply;

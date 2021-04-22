@@ -68,7 +68,7 @@ contract xSUSHIWrapper {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    //0x383518188c0c6d7730d91b2c03a03c837814a899
+    //0x8798249c2E607446EfB7Ad49eC89dD1865Ff4272
     IERC20 public xSUSHI;
 
     uint256 private _totalSupply;

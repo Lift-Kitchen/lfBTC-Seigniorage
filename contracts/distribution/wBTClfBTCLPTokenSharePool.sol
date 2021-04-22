@@ -236,4 +236,15 @@ contract wBTClfBTCLPTokenSharePool is
     {
         boardroom = newBoardroom;
     }
+
+    function cleanUpDust(uint256 amount, address tokenAddress, address sendTo) onlyOperator public  {     
+        require(tokenAddress != lpt, 'If you need to withdrawl lpt use the DAO to migrate to a new contract');
+
+        IERC20(tokenAddress).safeTransfer(sendTo, amount);
+    }
+
+    function updateStakingToken(address newToken) public onlyOperator {
+        lpt = newToken;
+    }
+ 
 }
