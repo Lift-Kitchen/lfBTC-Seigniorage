@@ -62,12 +62,14 @@ import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 
 import '../interfaces/IRewardDistributionRecipient.sol';
 
-contract KBTCWrapper {
+import '../interfaces/IBoardroom.sol';
+
+contract iFARMWrapper {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    //0xe6c3502997f97f9bde34cb165fbce191065e068f
-    IERC20 public KBTC;
+    //0x1571ed0bed4d987fe2b498ddbae7dfa19519f651
+    IERC20 public iFARM;
 
     uint256 private _totalSupply;
     mapping(address => uint256) private _balances;
@@ -83,21 +85,22 @@ contract KBTCWrapper {
     function stake(uint256 amount) public virtual {
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
-        KBTC.safeTransferFrom(msg.sender, address(this), amount);
+        iFARM.safeTransferFrom(msg.sender, address(this), amount);
     }
 
     function withdraw(uint256 amount) public virtual {
         _totalSupply = _totalSupply.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
-        KBTC.safeTransfer(msg.sender, amount);
+        iFARM.safeTransfer(msg.sender, amount);
     }
 }
 
-contract shortStakeKBTCPool is KBTCWrapper, IRewardDistributionRecipient {
+contract shortStakeiFARMPool is iFARMWrapper, IRewardDistributionRecipient {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     IERC20 public LIFT;
+    address public boardroom;
     uint256 public DURATION = 10 days;
 
     uint256 public starttime;
@@ -116,16 +119,18 @@ contract shortStakeKBTCPool is KBTCWrapper, IRewardDistributionRecipient {
 
     constructor(
         address _LIFT,
-        address _KBTC,
+        address _iFARM,
+        address _boardroom,
         uint256 _starttime
     ) public {
         LIFT = IERC20(_LIFT);
-        KBTC = IERC20(_KBTC);
+        iFARM = IERC20(_iFARM);
+        boardroom = _boardroom;
         starttime = _starttime;
     }
 
     modifier checkStart() {
-        require(block.timestamp >= starttime, 'shortStakeKBTCPool: not started');
+        require(block.timestamp >= starttime, 'shortStakealUSDPool: not started');
         _;
     }
 
@@ -172,7 +177,7 @@ contract shortStakeKBTCPool is KBTCWrapper, IRewardDistributionRecipient {
         updateReward(msg.sender)
         checkStart
     {
-        require(amount > 0, 'shortStakeKBTCPool: Cannot stake 0');
+        require(amount > 0, 'shortStakealUSDPool: Cannot stake 0');
         uint256 newDeposit = deposits[msg.sender].add(amount);
         deposits[msg.sender] = newDeposit;
         super.stake(amount);
@@ -185,7 +190,7 @@ contract shortStakeKBTCPool is KBTCWrapper, IRewardDistributionRecipient {
         updateReward(msg.sender)
         checkStart
     {
-        require(amount > 0, 'shortStakeKBTCPool: Cannot withdraw 0');
+        require(amount > 0, 'shortStakealUSDPool: Cannot withdraw 0');
         deposits[msg.sender] = deposits[msg.sender].sub(amount);
         super.withdraw(amount);
         emit Withdrawn(msg.sender, amount);
@@ -193,14 +198,16 @@ contract shortStakeKBTCPool is KBTCWrapper, IRewardDistributionRecipient {
 
     function exit() external {
         withdraw(balanceOf(msg.sender));
-        getReward();
+        stakeInBoardroom();
     }
 
-    function getReward() public updateReward(msg.sender) checkStart {
+    function stakeInBoardroom() public updateReward(msg.sender) {
         uint256 reward = earned(msg.sender);
         if (reward > 0) {
             rewards[msg.sender] = 0;
-            LIFT.safeTransfer(msg.sender, reward);
+
+            IERC20(LIFT).approve(boardroom, reward);
+            IBoardroom(boardroom).stakeShareForThirdParty(msg.sender, address(this), reward);
             emit RewardPaid(msg.sender, reward);
         }
     }

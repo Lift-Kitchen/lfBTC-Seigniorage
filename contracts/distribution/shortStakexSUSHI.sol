@@ -62,12 +62,14 @@ import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 
 import '../interfaces/IRewardDistributionRecipient.sol';
 
-contract OHMWrapper {
+import '../interfaces/IBoardroom.sol';
+
+contract xSUSHIWrapper {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     //0x383518188c0c6d7730d91b2c03a03c837814a899
-    IERC20 public OHM;
+    IERC20 public xSUSHI;
 
     uint256 private _totalSupply;
     mapping(address => uint256) private _balances;
@@ -83,21 +85,22 @@ contract OHMWrapper {
     function stake(uint256 amount) public virtual {
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
-        OHM.safeTransferFrom(msg.sender, address(this), amount);
+        xSUSHI.safeTransferFrom(msg.sender, address(this), amount);
     }
 
     function withdraw(uint256 amount) public virtual {
         _totalSupply = _totalSupply.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
-        OHM.safeTransfer(msg.sender, amount);
+        xSUSHI.safeTransfer(msg.sender, amount);
     }
 }
 
-contract shortStakeOHMPool is OHMWrapper, IRewardDistributionRecipient {
+contract shortStakexSUSHIPool is xSUSHIWrapper, IRewardDistributionRecipient {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     IERC20 public LIFT;
+    address public boardroom;
     uint256 public DURATION = 10 days;
 
     uint256 public starttime;
@@ -116,11 +119,13 @@ contract shortStakeOHMPool is OHMWrapper, IRewardDistributionRecipient {
 
     constructor(
         address _LIFT,
-        address _OHM,
+        address _xSUSHI,
+        address _boardroom,
         uint256 _starttime
     ) public {
         LIFT = IERC20(_LIFT);
-        OHM = IERC20(_OHM);
+        xSUSHI = IERC20(_xSUSHI);
+        boardroom = _boardroom;
         starttime = _starttime;
     }
 
@@ -191,16 +196,19 @@ contract shortStakeOHMPool is OHMWrapper, IRewardDistributionRecipient {
         emit Withdrawn(msg.sender, amount);
     }
 
+
     function exit() external {
         withdraw(balanceOf(msg.sender));
-        getReward();
+        stakeInBoardroom();
     }
 
-    function getReward() public updateReward(msg.sender) checkStart {
+    function stakeInBoardroom() public updateReward(msg.sender) {
         uint256 reward = earned(msg.sender);
         if (reward > 0) {
             rewards[msg.sender] = 0;
-            LIFT.safeTransfer(msg.sender, reward);
+
+            IERC20(LIFT).approve(boardroom, reward);
+            IBoardroom(boardroom).stakeShareForThirdParty(msg.sender, address(this), reward);
             emit RewardPaid(msg.sender, reward);
         }
     }

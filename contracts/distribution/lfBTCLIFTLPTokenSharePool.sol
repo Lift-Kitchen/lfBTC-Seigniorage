@@ -85,10 +85,10 @@ contract lfBTCLIFTLPTokenSharePool is
     uint256 public periodFinish = 0;
     uint256 public rewardRate = 0;
     
-    uint public TermOne = 1;
-    uint public TermTwo = 2;
-    uint public TermThree = 3;
-    uint public TermFour = 4;
+    uint public TermOne = 30;
+    uint public TermTwo = 60;
+    uint public TermThree = 90;
+    uint public TermFour = 120;
 
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;

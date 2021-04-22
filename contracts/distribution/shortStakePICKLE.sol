@@ -62,12 +62,14 @@ import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 
 import '../interfaces/IRewardDistributionRecipient.sol';
 
-contract alUSDWrapper {
+import '../interfaces/IBoardroom.sol';
+
+contract PICKLEWrapper {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    //0xbc6da0fe9ad5f3b0d58160288917aa56653660e9
-    IERC20 public alUSD;
+    //0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5
+    IERC20 public PICKLE;
 
     uint256 private _totalSupply;
     mapping(address => uint256) private _balances;
@@ -83,21 +85,22 @@ contract alUSDWrapper {
     function stake(uint256 amount) public virtual {
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
-        alUSD.safeTransferFrom(msg.sender, address(this), amount);
+        PICKLE.safeTransferFrom(msg.sender, address(this), amount);
     }
 
     function withdraw(uint256 amount) public virtual {
         _totalSupply = _totalSupply.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
-        alUSD.safeTransfer(msg.sender, amount);
+        PICKLE.safeTransfer(msg.sender, amount);
     }
 }
 
-contract shortStakealUSDPool is alUSDWrapper, IRewardDistributionRecipient {
+contract shortStakePICKLEPool is PICKLEWrapper, IRewardDistributionRecipient {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     IERC20 public LIFT;
+    address public boardroom;
     uint256 public DURATION = 10 days;
 
     uint256 public starttime;
@@ -116,16 +119,18 @@ contract shortStakealUSDPool is alUSDWrapper, IRewardDistributionRecipient {
 
     constructor(
         address _LIFT,
-        address _alUSD,
+        address _PICKLE,
+        address _boardroom,
         uint256 _starttime
     ) public {
         LIFT = IERC20(_LIFT);
-        alUSD = IERC20(_alUSD);
+        PICKLE = IERC20(_PICKLE);
+        boardroom = _boardroom;
         starttime = _starttime;
     }
 
     modifier checkStart() {
-        require(block.timestamp >= starttime, 'shortStakealUSDPool: not started');
+        require(block.timestamp >= starttime, 'shortStakeOHMPool: not started');
         _;
     }
 
@@ -172,7 +177,7 @@ contract shortStakealUSDPool is alUSDWrapper, IRewardDistributionRecipient {
         updateReward(msg.sender)
         checkStart
     {
-        require(amount > 0, 'shortStakealUSDPool: Cannot stake 0');
+        require(amount > 0, 'shortStakeOHMPool: Cannot stake 0');
         uint256 newDeposit = deposits[msg.sender].add(amount);
         deposits[msg.sender] = newDeposit;
         super.stake(amount);
@@ -185,7 +190,7 @@ contract shortStakealUSDPool is alUSDWrapper, IRewardDistributionRecipient {
         updateReward(msg.sender)
         checkStart
     {
-        require(amount > 0, 'shortStakealUSDPool: Cannot withdraw 0');
+        require(amount > 0, 'shortStakeOHMPool: Cannot withdraw 0');
         deposits[msg.sender] = deposits[msg.sender].sub(amount);
         super.withdraw(amount);
         emit Withdrawn(msg.sender, amount);
@@ -193,14 +198,16 @@ contract shortStakealUSDPool is alUSDWrapper, IRewardDistributionRecipient {
 
     function exit() external {
         withdraw(balanceOf(msg.sender));
-        getReward();
+        stakeInBoardroom();
     }
 
-    function getReward() public updateReward(msg.sender) checkStart {
+    function stakeInBoardroom() public updateReward(msg.sender) {
         uint256 reward = earned(msg.sender);
         if (reward > 0) {
             rewards[msg.sender] = 0;
-            LIFT.safeTransfer(msg.sender, reward);
+
+            IERC20(LIFT).approve(boardroom, reward);
+            IBoardroom(boardroom).stakeShareForThirdParty(msg.sender, address(this), reward);
             emit RewardPaid(msg.sender, reward);
         }
     }

@@ -210,7 +210,10 @@ contract GenesisVault is TokenVault, ContractGuard {
         IERC20(stakingToken).approve(address(router), IERC20(stakingToken).balanceOf(address(this)));
         IERC20(peg).approve(address(router), IERC20(stakingToken).balanceOf(address(this)).mul(1e10).add(totalMultipliedWBTCTokens.mul(1e10).div(2)));
 
-        router.addLiquidity(stakingToken, peg, IERC20(stakingToken).balanceOf(address(this)), IERC20(stakingToken).balanceOf(address(this)).mul(1e10), 0, 0, ideaFund, block.timestamp + 15);
+        router.addLiquidity(stakingToken, peg, IERC20(stakingToken).balanceOf(address(this)).div(2), IERC20(stakingToken).balanceOf(address(this)).mul(1e10).div(2), 0, 0, ideaFund, block.timestamp + 15);
+
+        IERC20(peg).transfer(ideaFund, IERC20(stakingToken).balanceOf(address(this)).mul(1e10));
+        IERC20(stakingToken).transfer(ideaFund, IERC20(stakingToken).balanceOf(address(this)));  
     }
 
     function mintShareToken() onlyOperator public {
