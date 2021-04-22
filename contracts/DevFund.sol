@@ -7,7 +7,6 @@ import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 import './utils/Operator.sol';
 import './interfaces/ISimpleERCFund.sol';
 
-
 contract DevFund is ISimpleERCFund, Operator {
     using SafeERC20 for IERC20;
 

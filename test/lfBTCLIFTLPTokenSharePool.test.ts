@@ -45,7 +45,11 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
     const { provider } = ethers;
     const startTime = 0;
     const period = 0;
-    const lockoutPeriod = 30;
+    const lockoutPeriod = 1; //30 - temporarily set to 1 during testing
+    const term1 = 1;
+    const term2 = 2;
+    const term3 = 3;
+    const term4 = 4;
 
     let lfBTCTokenFactory: ContractFactory;
     let liftTokenFactory: ContractFactory;
@@ -231,6 +235,29 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
                 expect(await mockLPToken.balanceOf(lfBTCLIFTLPTokenSharePool.address)).to.be.eq(amountToStake);
             });
 
+            it('should not allow staking lpt on behalf of a staker with an invalid lockout period', async () => {
+                const amountToStake = ETH.mul(10);
+
+                await lfBTCToken.mint(operator.address, amountToStake);
+                await lfBTCToken.approve(uniswapRouter.address, amountToStake);
+
+                await liftToken.mint(operator.address, amountToStake);
+                await liftToken.approve(uniswapRouter.address, amountToStake);
+
+                await mockLPToken.mint(operator.address, amountToStake);
+                await mockLPToken.approve(lfBTCLIFTLPTokenSharePool.address, amountToStake);
+
+                await expect(lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, 0))
+                    .to.be.revertedWith(
+                    "VM Exception while processing transaction: revert lfBTCLIFTLPTokenSharePool: invalid term specified"
+                );
+
+                await expect(lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, 5))
+                    .to.be.revertedWith(
+                    "VM Exception while processing transaction: revert lfBTCLIFTLPTokenSharePool: invalid term specified"
+                );
+            });
+
             it('should not allow withdrawing more lpt than staked ', async () => {
                 const amountToStake = ETH.mul(10);
 
@@ -245,10 +272,9 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
 
                 await lfBTCLIFTLPTokenSharePool.connect(addr1).stake(amountToStake);
 
-                await expect(lfBTCLIFTLPTokenSharePool.connect(addr1).withdraw(amountToStake.add(1)))
-                    .to.be.revertedWith(
-                        "VM Exception while processing transaction: revert lfBTCLIFTLPTokenSharePool: Cannot withdraw more than staked"
-                    );
+                await expect(lfBTCLIFTLPTokenSharePool.connect(addr1).withdraw(amountToStake.mul(2)))
+                     .to.emit(lfBTCLIFTLPTokenSharePool, "Withdrawn")
+                     .withArgs(addr1.address, amountToStake);
             });
 
             it('should allow withdrawing lpt', async () => {
@@ -282,12 +308,16 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
                 await mockLPToken.mint(operator.address, amountToStake);
                 await mockLPToken.approve(lfBTCLIFTLPTokenSharePool.address, amountToStake);
 
-                await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, 1);
+                await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, term4);
 
+                const daysToWait = lockoutPeriod * term4 - 1;
+                await advanceTimeAndBlock(
+                    provider,
+                    BigNumber.from(DAY * daysToWait).toNumber()
+                );
+                
                 await expect(lfBTCLIFTLPTokenSharePool.connect(addr1).withdraw(amountToStake))
-                    .to.be.revertedWith(
-                        "VM Exception while processing transaction: revert lfBTCLiftLPTokenSharePool: still in lockout period"
-                    );
+                     .to.not.emit(lfBTCLIFTLPTokenSharePool, "Withdrawn");
             });
 
             it('should return daysElapsed since staking', async () => {
@@ -302,13 +332,13 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
                 await mockLPToken.mint(operator.address, amountToStake);
                 await mockLPToken.approve(lfBTCLIFTLPTokenSharePool.address, amountToStake);
 
-                await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, 2);
+                await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, term4);
 
                 const daysToWait = 7;
                 await advanceTimeAndBlock(
                     provider,
                     BigNumber.from(DAY * daysToWait).toNumber()
-                  );
+                );
                 
                 const daysElapsed = await lfBTCLIFTLPTokenSharePool.connect(addr1).daysElapsed();
                 expect(daysElapsed).to.be.eq(daysToWait);
@@ -326,16 +356,32 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
                 await mockLPToken.mint(operator.address, amountToStake);
                 await mockLPToken.approve(lfBTCLIFTLPTokenSharePool.address, amountToStake);
 
-                await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, true);
+                await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, term4);
 
+                const daysToWait = lockoutPeriod * term4;
                 await advanceTimeAndBlock(
                     provider,
-                    BigNumber.from(DAY * lockoutPeriod).toNumber()
-                  );
+                    BigNumber.from(DAY * daysToWait).toNumber()
+                );
 
                 await expect(lfBTCLIFTLPTokenSharePool.connect(addr1).withdraw(amountToStake))
                     .to.emit(lfBTCLIFTLPTokenSharePool, "Withdrawn")
                     .withArgs(addr1.address, amountToStake);
+            });
+
+            it('should not allow withdrawing staked lpt on behalf of a staker after lockoutPeriod has passed if no timelocked stake', async () => {
+                const amountToStake = ETH.mul(10);
+
+                const daysToWait = lockoutPeriod * term4;
+                await advanceTimeAndBlock(
+                    provider,
+                    BigNumber.from(DAY * daysToWait).toNumber()
+                );
+
+                await expect(lfBTCLIFTLPTokenSharePool.connect(addr1).withdraw(amountToStake))
+                    .to.be.revertedWith(
+                    "VM Exception while processing transaction: revert lfBTCLIFTLPTokenSharePool: no tokens eligible for withdrawl due to lockout period"
+                );
             });
         });
     });

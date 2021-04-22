@@ -176,6 +176,7 @@ contract lfBTCLIFTLPTokenSharePool is
     function stakeLP(address staker, address from, uint256 amount, uint term) external updateReward(staker)
     {
         require(amount > 0, 'lfBTCLIFTLPTokenSharePool: cannot stake 0');
+        require(term >= 1 && term <= 4, 'lfBTCLIFTLPTokenSharePool: invalid term specified');
 
         StakingSeat memory seat = stakers[staker];
 
