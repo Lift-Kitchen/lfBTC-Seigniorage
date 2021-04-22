@@ -54,7 +54,7 @@ contract Treasury is Operator, ContractGuard, Epoch {
     uint256 public constant wbtcOneUnit = 1e18;
 
     uint256 public pegPriceCeiling = 105; // lfbtc / wbtc
-    uint256 public expansionPercentage = 10;
+    uint256 public expansionPercentage = 5;
     
     uint256 public devfundAllocationRate = 5; // DEV FUND
     uint256 public ideafundAllocationRate = 75; // %STABLIZATION
