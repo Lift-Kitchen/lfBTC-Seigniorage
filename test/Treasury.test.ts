@@ -207,6 +207,24 @@ describe('Treasury', () => {
                 expect(await treasury.ideafundAllocationRate()).to.be.eq(newAllocationRate);
             });
 
+            it('should not allow mintControlForIdeaFund to be called except by ideafund', async () => {
+                const amountToMint = ETH.mul(10);
+
+                await expect(treasury.mintControlForIdeaFund(operator.address, amountToMint))
+                    .to.be.revertedWith(
+                        "VM Exception while processing transaction: revert Treasury: You cant call this!"
+                    );
+            });
+
+            it('should not allow burnControlForIdeaFund to be called except by ideafund', async () => {
+                const amountToMint = ETH.mul(10);
+
+                await expect(treasury.burnControlForIdeaFund(operator.address, amountToMint))
+                    .to.be.revertedWith(
+                        "VM Exception while processing transaction: revert Treasury: You cant call this!"
+                    );
+            });
+
             it('should allow setting the devfund allocation Rate', async () => {
                 const currentAllocationRate = await treasury.devfundAllocationRate();
                 const newAllocationRate = currentAllocationRate + 1;
