@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.0;
-//pragma experimental ABIEncoderV2;
+
+//Contract deployed by CRYPTOCLUB SPV 2021, LLC dba Lift.Kitchen - 4/24/2021
 
 // --------------------------------------------------------------------------------------
 // GENESISVault.sol - 3/16/2021 by CryptoGamblers
