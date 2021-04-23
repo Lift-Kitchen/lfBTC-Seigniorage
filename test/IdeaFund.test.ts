@@ -317,6 +317,121 @@ describe('IdeaFund', () => {
            
                 expect(await haifToken.balanceOf(ideaFund.address)).to.be.gt(0);
             });
+
+            it('should not allow redeeming control with 0 amount', async () => {
+                await ideaFund.setRedemptions(treasury.address, true);
+
+                await expect(ideaFund.connect(addr1).redeemCTRL(0))
+                    .to.be.revertedWith(
+                        "VM Exception while processing transaction: revert Idea Fund: cannot redeem CTRL with zero amount"
+                    );
+            });
+
+            it('should not allow redeeming control when when supply is 0', async () => {
+                await ideaFund.setRedemptions(treasury.address, true);
+                
+                await expect(ideaFund.connect(addr1).redeemCTRL(1))
+                    .to.be.revertedWith(
+                        "VM Exception while processing transaction: revert Idea Fund: cannot redeem CTRL when supply is 0"
+                    );
+            });
+
+            it('should not allow redeeming control when treasury has no wbtc', async () => {
+                await ideaFund.setRedemptions(treasury.address, true);
+
+                await ctrlToken.mint(ideaFund.address, ETH.mul(1));
+                
+                await expect(ideaFund.connect(addr1).redeemCTRL(1))
+                    .to.be.revertedWith(
+                        "VM Exception while processing transaction: revert Idea Fund: Treasury does not currently hold any wBTC"
+                    );
+            });
+
+            // it('should not allow redeeming control when treasury lacks enough funds', async () => {
+            //     const tokenAmount = 1;
+            //     const amountToFund = ETH.mul(tokenAmount).div(2);
+
+            //     await ctrlToken.mint(ideaFund.address, amountToFund);
+            //     await mockwBTCToken.mint(ideaFund.address, 50);
+
+            //     await ideaFund.setRedemptions(treasury.address, true);
+
+            //     await ideaFund.connect(addr1).redeemCTRL(amountToFund);
+            // });
+
+            it('should not allow redeeming control when treasury lacks approval to burn funds', async () => {
+                const tokenAmount = 1;
+                const amountToFund = ETH.mul(tokenAmount).div(2);
+
+                await ctrlToken.mint(ideaFund.address, amountToFund);
+                await mockwBTCToken.mint(ideaFund.address, 50);
+
+                await ideaFund.setRedemptions(treasury.address, true);
+
+                await expect(ideaFund.connect(addr1).redeemCTRL(1))
+                    .to.be.revertedWith(
+                        "VM Exception while processing transaction: revert Treasury: is not approved to burn your CTRL"
+                    );
+            });
+
+            it('should not allow redeeming control amount greater than owned', async () => {
+                const tokenAmount = 10;
+                const amountToFund = ETH.mul(tokenAmount);
+
+                await mockwBTCToken.mint(ideaFund.address, 50);
+              
+                await lfBTCToken.mint(addr1.address, amountToFund);
+                await lfBTCToken.connect(addr1).approve(ideaFund.address, amountToFund);
+
+                const pegPrice = await mockOracle.priceOf(lfBTCToken.address);
+                const ctrlPrice = await mockOracle.priceOf(ctrlToken.address);
+
+                const totalInvestment = tokenAmount * pegPrice;
+                const controlNeeded = Math.ceil(totalInvestment / ctrlPrice);
+
+                await ctrlToken.mint(ideaFund.address, ETH.mul(controlNeeded));
+                await ctrlToken.transferOperator(treasury.address);
+
+                await ideaFund.setRedemptions(treasury.address, true);
+
+                await ideaFund.connect(addr1).buyCTRL(lfBTCToken.address, amountToFund);
+                let ctrlPurchased : BigNumber;
+                ctrlPurchased = await ctrlToken.balanceOf(addr1.address);
+                ctrlPurchased = ctrlPurchased.mul(2);
+
+                await ctrlToken.connect(addr1).approve(treasury.address, ctrlPurchased);
+                await expect(ideaFund.connect(addr1).redeemCTRL(ctrlPurchased))
+                    .to.be.revertedWith(
+                        "VM Exception while processing transaction: revert ERC20: burn amount exceeds balance"
+                    );
+            });
+
+            it('should allow redeeming control', async () => {
+                const tokenAmount = 10;
+                const amountToFund = ETH.mul(tokenAmount);
+
+                await mockwBTCToken.mint(ideaFund.address, 50);
+              
+                await lfBTCToken.mint(addr1.address, amountToFund);
+                await lfBTCToken.connect(addr1).approve(ideaFund.address, amountToFund);
+
+                const pegPrice = await mockOracle.priceOf(lfBTCToken.address);
+                const ctrlPrice = await mockOracle.priceOf(ctrlToken.address);
+
+                const totalInvestment = tokenAmount * pegPrice;
+                const controlNeeded = Math.ceil(totalInvestment / ctrlPrice);
+
+                await ctrlToken.mint(ideaFund.address, ETH.mul(controlNeeded));
+                await ctrlToken.transferOperator(treasury.address);
+
+                await ideaFund.setRedemptions(treasury.address, true);
+
+                await ideaFund.connect(addr1).buyCTRL(lfBTCToken.address, amountToFund);
+                const ctrlPurchased = await ctrlToken.balanceOf(addr1.address);
+
+                await ctrlToken.connect(addr1).approve(treasury.address, ctrlPurchased);
+                await ideaFund.connect(addr1).redeemCTRL(ctrlPurchased);
+            });
         });
     });
 });
