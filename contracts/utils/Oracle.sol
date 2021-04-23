@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.0;
 
+//Contract deployed by CRYPTOCLUB SPV 2021, LLC dba Lift.Kitchen - 4/24/2021
+
 import '@openzeppelin/contracts/math/SafeMath.sol';
 
 import '../interfaces/IUniswapV2Pair.sol'; // source of pricing for wbtc, lfbtc, lift
@@ -13,9 +15,6 @@ import '../interfaces/ILinkOracle.sol'; // LINK
 import '../lib/Babylonian.sol';
 import '../lib/FixedPoint.sol';
 import '../lib/UniswapV2Library.sol';
-//import '../lib/UniswapV2OracleLibrary.sol';
-//import './Epoch.sol';
-
 
 // fixed window oracle that recomputes the average price for the entire period once every period
 // note that the price average is only guaranteed to be over at least 1 period, but may be over a longer period

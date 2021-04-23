@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.0;
 
+//Contract deployed by CRYPTOCLUB SPV 2021, LLC dba Lift.Kitchen - 4/24/2021
+
 import '@openzeppelin/contracts/math/Math.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
-//import 'hardhat/console.sol';
 
 import './interfaces/IOracle.sol';
 import './interfaces/IBoardroom.sol';
 import './interfaces/IBasisAsset.sol';
-//import './interfaces/ISimpleERCFund.sol';
-//import './interfaces/IIdeaFund.sol';
+
 import './lib/Babylonian.sol';
 import './lib/FixedPoint.sol';
 
@@ -50,9 +50,6 @@ contract Treasury is Operator, ContractGuard, Epoch {
     address public theOracle; 
 
     // ========== PARAMS
-    uint256 public constant pegOneUnit = 1e18;
-    uint256 public constant wbtcOneUnit = 1e18;
-
     uint256 public pegPriceCeiling = 105; // lfbtc / wbtc
     uint256 public expansionPercentage = 5;
     
@@ -169,7 +166,7 @@ contract Treasury is Operator, ContractGuard, Epoch {
         }
     
         //total seigniorage should be no more than 10% of current supply based on peg / wbtc value
-        uint256 seigniorage = pegSupply.mul(percentage).div(wbtcOneUnit);
+        uint256 seigniorage = pegSupply.mul(percentage).div(1e18);
 
         uint256 pegMint = seigniorage.mul(ideafundAllocationRate.add(devfundAllocationRate)).div(100);
         //mint in peg token the seigniorage multiplied by the X% for devfund and x% for ideafund

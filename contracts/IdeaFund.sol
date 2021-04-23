@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.0;
 
+//Contract deployed by CRYPTOCLUB SPV 2021, LLC dba Lift.Kitchen - 4/24/2021
+
 import '@openzeppelin/contracts/math/Math.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
@@ -9,7 +11,6 @@ import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import './interfaces/IUniswapV2Pair.sol';
 import './interfaces/IUniswapV2Router02.sol';
 import './interfaces/IOracle.sol';
-//import './interfaces/IBasisAsset.sol';
 import './interfaces/ITreasury.sol';
 import './interfaces/IHedgeFund.sol';
 
@@ -21,7 +22,6 @@ import './utils/Operator.sol';
 import './utils/Epoch.sol';
 import './utils/ContractGuard.sol';
 
-//import 'hardhat/console.sol';
 
 contract IdeaFund is Operator, ContractGuard {
     using SafeERC20 for IERC20;
