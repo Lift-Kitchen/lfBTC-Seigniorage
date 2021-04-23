@@ -45,7 +45,7 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
     const { provider } = ethers;
     const startTime = 0;
     const period = 0;
-    const lockoutPeriod = 1; //30 - temporarily set to 1 during testing
+    const lockoutPeriod = 30;
     const term1 = 1;
     const term2 = 2;
     const term3 = 3;
@@ -310,7 +310,7 @@ describe('lfBTCLIFTLPTokenSharePool', () => {
 
                 await lfBTCLIFTLPTokenSharePool.stakeLP(addr1.address, operator.address, amountToStake, term4);
 
-                const daysToWait = lockoutPeriod * term4 - 1;
+                const daysToWait = (lockoutPeriod * term4) - 1;
                 await advanceTimeAndBlock(
                     provider,
                     BigNumber.from(DAY * daysToWait).toNumber()
