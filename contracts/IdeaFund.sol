@@ -73,9 +73,7 @@ contract IdeaFund is Operator, ContractGuard {
     // the first divide by 2 is for the lfbtc, lift and control tokens representing value in the hedgefund (HAIF Value)
     // the second divide by 2 leaves funds in the idea fund to also stablize and invest should all owners of control decide to sell
     function getControlPrice() public view returns(uint256) {
-
         //calculate value   
-        //TODO Math update based on 10 digits     
         return (_haifSupply.mul(IOracle(theOracle).priceOf(hedge)).div(2) + IERC20(wbtc).balanceOf(address(this)).mul(1e10).mul(IOracle(theOracle).wbtcPriceOne())).div(variableReduction).div(IERC20(control).totalSupply());
     }
 
@@ -106,9 +104,10 @@ contract IdeaFund is Operator, ContractGuard {
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 
         //Have to request Treasury sends mint to the lfbtc/lift seller
-        ITreasury(treasury).mintControlForIdeaFund(msg.sender, valueofToken.div(IOracle(theOracle).priceOf(control)));
+        uint256 ctrlToMint = valueofToken.div(IOracle(theOracle).priceOf(control));
+        ITreasury(treasury).mintControlForIdeaFund(msg.sender, ctrlToMint);
 
-        emit SoldCTRL(msg.sender, amount);
+        emit SoldCTRL(msg.sender, ctrlToMint);
     }
 
     function redeemCTRL(uint256 amount) 
@@ -117,6 +116,9 @@ contract IdeaFund is Operator, ContractGuard {
         ctrlRedeemable
     {
         require(amount > 0, 'Idea Fund: cannot redeem CTRL with zero amount');
+        require(IERC20(control).totalSupply() > 0, 'Idea Fund: cannot redeem CTRL when supply is 0');
+        require(IERC20(wbtc).balanceOf(address(this)) > 0, 'Idea Fund: Treasury does not currently hold any wBTC');
+
         require(
             IERC20(wbtc).balanceOf(address(this)).mul(1e10).mul(IOracle(theOracle).wbtcPriceOne()) >= amount.mul(getControlPrice()),
             'Idea Fund: Treasury does not currently hold enough wBTC to purchase'
