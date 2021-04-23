@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-//Contract deployed by CRYPTOCLUB SPV 2021, LLC dba Lift.Kitchen - 4/24/2021
+//Contract deployed by LK Tech Club Incubator 2021 dba Lift.Kitchen - 4/24/2021
 
 contract Migrations {
   address public owner = msg.sender;

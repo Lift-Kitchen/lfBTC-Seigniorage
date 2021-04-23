@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.0;
 
-//Contract deployed by CRYPTOCLUB SPV 2021, LLC dba Lift.Kitchen - 4/24/2021
+//Contract deployed by LK Tech Club Incubator 2021 dba Lift.Kitchen - 4/24/2021
 
 // --------------------------------------------------------------------------------------
 // GENESISVault.sol - 3/16/2021 by CryptoGamblers

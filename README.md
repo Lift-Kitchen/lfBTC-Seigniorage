@@ -9,6 +9,9 @@ Execute Begin Genesis
 - Migrate GenesisVault to DeployerWallet
     - Mint LIFT needed for 4 Single Stake Pools (2% APY a day - .5% APY per pool per day)
     - Migrate LFBTC/LIFT operator/ownership to Treasury Contract
+- Determine if more CTRL is needed for first 8 hours of staking .02 per 1 wbtc.
+    - Mint needed CTRL
+    - Transfer CTRL ownership to Treasury
 - IdeaFund will be holding wBTC/lfBTC tokens
     - Transfer LP tokens to HedgeFund
     - Transfer LP tokens to HedgeFund wallet

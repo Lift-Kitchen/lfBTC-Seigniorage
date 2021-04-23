@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.0;
-//Contract deployed by CRYPTOCLUB SPV 2021, LLC dba Lift.Kitchen - 4/24/2021
+//Contract deployed by LK Tech Club Incubator 2021 dba Lift.Kitchen - 4/24/2021
 
 // --------------------------------------------------------------------------------------
 // At expansion Stakers (LIFT & CTRL) collect 20% (variable below) in CTRL
