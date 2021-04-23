@@ -68,6 +68,8 @@ import '../utils/Operator.sol';
 
 import '../utils/LPTokenWrapper.sol';
 
+//import 'hardhat/console.sol';
+
 contract lfBTCLIFTLPTokenSharePool is
     LPTokenWrapper,
     IRewardDistributionRecipient,

@@ -37,7 +37,7 @@ import './lib/FixedPoint.sol';
 import './utils/Operator.sol';
 import './utils/ContractGuard.sol';
 
-import 'hardhat/console.sol';
+//import 'hardhat/console.sol';
 
 abstract contract TokenVault is Operator {
     using SafeMath for uint256;

@@ -190,6 +190,8 @@ describe('IdeaFund', () => {
             devFund.address,
             startTime
         );
+
+        ideaFund.updateAddresses(treasury.address, hedgeFund.address);
     });
 
     describe('Deployment', async () => {
