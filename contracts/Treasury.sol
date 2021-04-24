@@ -88,7 +88,6 @@ contract Treasury is Operator, ContractGuard, Epoch {
     modifier checkOperator {
         require(
             IBasisAsset(peg).operator() == address(this) &&
-            IBasisAsset(share).operator() == address(this) &&
             IBasisAsset(control).operator() == address(this) &&
             Operator(boardroom).operator() == address(this),
             'Treasury: need more permission'
