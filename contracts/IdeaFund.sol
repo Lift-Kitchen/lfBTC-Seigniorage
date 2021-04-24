@@ -89,6 +89,7 @@ contract IdeaFund is Operator, ContractGuard {
     {
         require(amount > 0, 'Idea Fund: cannot sell you zero ctrl');
         require(IERC20(token).allowance(msg.sender, address(this)) >= amount, 'Idea Fund: You have not approved the transfer of your token to Idea Fund');
+        require(IOracle(theOracle).priceOf(wbtc).mul(105) > IOracle(theOracle).priceOf(peg).mul(100), 'Idea Fund: Peg is too high to exchange right now');
         
         uint256 valueofToken = 0;
         if(token == peg){

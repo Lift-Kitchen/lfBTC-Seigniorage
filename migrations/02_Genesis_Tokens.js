@@ -23,7 +23,7 @@ module.exports = migration
 async function deployToken(deployer, network, accounts) {
   if (network !== 'mainnet') {
     const mockwbtc = await deployer.deploy(MockwBTC);
-    const mockerc20 = await deployer.deploy(MockERC20);
+    //const mockerc20 = await deployer.deploy(MockERC20);
     //console.log(`MockwBTC address: ${mockwbtc.address}`);
   }
 
