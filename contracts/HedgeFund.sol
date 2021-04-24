@@ -187,12 +187,14 @@ contract HedgeFund is Operator, ContractGuard {
     }
 
     function hedgePrice() public view returns (uint256) {
-            uint daysSinceStart = (block.timestamp - starttime) / 60 / 60 / 24;
+            uint daysSinceStart = starttime > block.timestamp ? 1 : (block.timestamp - starttime) / 60 / 60 / 24;
             //console.log(startingValue.mul(growthRate**daysSinceStart).div(1e36));
             return startingValue.mul((growthRate**daysSinceStart)).div(1e4**daysSinceStart);
     }
 
     function hedgeDaysSinceStart() public view returns (uint256) {
+        if (starttime > block.timestamp)
+            return 0;
         return (block.timestamp - starttime) / 60 / 60 / 24;
     }
 

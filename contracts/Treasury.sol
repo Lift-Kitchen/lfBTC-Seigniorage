@@ -157,8 +157,6 @@ contract Treasury is Operator, ContractGuard, Epoch {
         
         //should return Current Peg Percentage (1.05 - 1)
         uint256 percentage = pegPrice.mul(100).div(IOracle(theOracle).wbtcPriceOne()).sub(100);
-        if(percentage <= 0)
-            return;
 
         if (percentage > expansionPercentage) {
             percentage = uint256(10e18).div(100);
