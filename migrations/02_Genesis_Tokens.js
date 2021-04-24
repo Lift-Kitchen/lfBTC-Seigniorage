@@ -3,7 +3,7 @@
 // Token
 // deployed first
 const MockwBTC = artifacts.require('MockwBTC');
-const MockERC20 = artifacts.require('MockERC20');
+//const MockERC20 = artifacts.require('MockERC20');
 const Peg = artifacts.require('LFBTC')
 const Share = artifacts.require('LIFT')
 const Control = artifacts.require('CTRL')
