@@ -67,7 +67,7 @@ contract HedgeFund is Operator, ContractGuard {
     uint public startingValue = 500e18;
     uint256 public starttime;
 
-    mapping(address => uint256) private _haifBalances;
+    //mapping(address => uint256) private _haifBalances;
 
     //validate this is .25% (1.0025)
     uint public growthRate = 10025;
@@ -159,7 +159,7 @@ contract HedgeFund is Operator, ContractGuard {
                 mintedHedge = amount.mul(tokenPrice).div(hedgePrice());
             }
             
-            _haifBalances[msg.sender] += mintedHedge;
+            //_haifBalances[msg.sender] += mintedHedge;
             IBasisAsset(hedge).mint(address(this), mintedHedge);
             IERC20(hedge).transfer(msg.sender, mintedHedge);
 
@@ -171,11 +171,11 @@ contract HedgeFund is Operator, ContractGuard {
     // this will only return availble wBTC - and only to people with HAIF balances.
     function withdrawFromHedgeFund(uint256 amount) external hasOracle hasLPPoolValues returns (uint256 removedHaifAmount) {
 
-            require(_haifBalances[msg.sender] >= amount, 'HedgeFund: You dont have this amount invested');
+            //require(_haifBalances[msg.sender] >= amount, 'HedgeFund: You dont have this amount invested');
             require(IERC20(storedvalueToken).balanceOf(address(this)).mul(1e10).mul(IOracle(theOracle).wbtcPriceOne()) >= amount.mul(hedgePrice()), 'HedgeFund: We dont have enough wbtc to pay you out currently please check back in 24 hours');
             require(amount <= IERC20(hedge).allowance(msg.sender, address(this)), 'HedgeFund: You must approve the haif amount before calling');
 
-            _haifBalances[msg.sender] -= amount;
+            //_haifBalances[msg.sender] -= amount;
             IBasisAsset(hedge).burnFrom(msg.sender,amount);
 
             uint256 transferAmount = amount.mul(hedgePrice()).div(IOracle(theOracle).wbtcPriceOne()).div(1e10);

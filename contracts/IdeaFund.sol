@@ -22,7 +22,6 @@ import './utils/Operator.sol';
 import './utils/Epoch.sol';
 import './utils/ContractGuard.sol';
 
-
 contract IdeaFund is Operator, ContractGuard {
     using SafeERC20 for IERC20;
     using Address for address;
@@ -89,7 +88,7 @@ contract IdeaFund is Operator, ContractGuard {
     {
         require(amount > 0, 'Idea Fund: cannot sell you zero ctrl');
         require(IERC20(token).allowance(msg.sender, address(this)) >= amount, 'Idea Fund: You have not approved the transfer of your token to Idea Fund');
-        //require(IOracle(theOracle).priceOf(wbtc).mul(105) > IOracle(theOracle).priceOf(peg).mul(100), 'Idea Fund: Peg is too high to exchange right now');
+        require(IOracle(theOracle).priceOf(wbtc).mul(105) > IOracle(theOracle).priceOf(peg).mul(100), 'Idea Fund: Peg is too high to exchange right now');
         
         uint256 valueofToken = 0;
         if(token == peg){
@@ -99,8 +98,6 @@ contract IdeaFund is Operator, ContractGuard {
         } else { 
             require(false, 'Idea Fund: We only buy the protocol peg token and share token');
         }
-
-        //require(IERC20(control).balanceOf(address(this)).mul(IOracle(theOracle).priceOf(control)) >= valueofToken, 'Idea Fund: Sorry we dont have enough control token to cover this'); 
 
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 
@@ -117,11 +114,11 @@ contract IdeaFund is Operator, ContractGuard {
         ctrlRedeemable
     {
         require(amount > 0, 'Idea Fund: cannot redeem CTRL with zero amount');
-        require(IERC20(control).totalSupply() > 0, 'Idea Fund: cannot redeem CTRL when supply is 0');
-        require(IERC20(wbtc).balanceOf(address(this)) > 0, 'Idea Fund: Treasury does not currently hold any wBTC');
 
+        uint256 toSend = amount.mul(getControlPrice()).div(IOracle(theOracle).wbtcPriceOne()).div(1e10);
+                
         require(
-            IERC20(wbtc).balanceOf(address(this)).mul(1e10).mul(IOracle(theOracle).wbtcPriceOne()) >= amount.mul(getControlPrice()),
+            IERC20(wbtc).balanceOf(address(this)) >= toSend,
             'Idea Fund: Treasury does not currently hold enough wBTC to purchase'
         );
 
@@ -130,9 +127,9 @@ contract IdeaFund is Operator, ContractGuard {
 
         ITreasury(treasury).burnControlForIdeaFund(msg.sender, amount);
         
-        IERC20(wbtc).safeTransfer(msg.sender, amount.mul(getControlPrice()).div(IOracle(theOracle).wbtcPriceOne()).div(1e10));
+        IERC20(wbtc).safeTransfer(msg.sender, toSend);
         
-        emit RedeemedCTRL(msg.sender, amount);
+        emit RedeemedCTRL(msg.sender, toSend);
     }
    
     function investInHedgeFund(address token, uint256 amount) public onlyOperator {

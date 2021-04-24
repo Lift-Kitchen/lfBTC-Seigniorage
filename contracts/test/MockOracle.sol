@@ -62,7 +62,7 @@ contract MockOracle is IOracle {
         } else if (token == share) {
             return uint256(43e18);
         } else if (token == control) {
-            return uint256(113000e18);
+            return uint256(500000e18);
         } else if (token == wbtc) {
             return uint256(57800e18);
         } else if (token == hedge) {

@@ -43,6 +43,6 @@ module.exports = async (deployer, network, accounts) => {
    await hedge.transferOwnership(hedgefund.address);
 
    await boardroom.transferOperator(treasury.address);
-   await boardroom.transferOwnership(treasury.address);
+   
 
  }
