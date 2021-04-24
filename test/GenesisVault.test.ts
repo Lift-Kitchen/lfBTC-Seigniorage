@@ -215,7 +215,7 @@ describe('GenesisVault', () => {
             });
 
             it('should stake correctly', async () => {
-                const amountToStake = ETH.mul(1000);
+                const amountToStake = 1000e8;
 
                 await mockwBTCToken.mint(addr1.address, amountToStake);
                 await mockwBTCToken.connect(addr1).approve(genesisVault.address, amountToStake);
@@ -227,7 +227,7 @@ describe('GenesisVault', () => {
             });
 
             it('should getStakingTokenPrice', async () => {
-                const kwTCAmountToMint = ETH.mul(20);
+                const kwTCAmountToMint = 20e8;
 
                 await mockwBTCToken.connect(operator).mint(operator.address, kwTCAmountToMint);
                 await mockwBTCToken.connect(operator).approve(uniswapRouter.address, kwTCAmountToMint);

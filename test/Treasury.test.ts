@@ -241,7 +241,7 @@ describe('Treasury', () => {
                 mockOracle.setPrice(price);
 
                 await lfBTCToken.mint(treasury.address, ETH.mul(25));
-                await mockwBTCToken.mint(ideaFund.address, ETH.mul(33));
+                await mockwBTCToken.mint(ideaFund.address, 33e8);
                 await ctrlToken.mint(treasury.address, ETH.mul(6));
 
                 const amountToStake = ETH.mul(10);
@@ -272,7 +272,7 @@ describe('Treasury', () => {
                 mockOracle.setPrice(price);
 
                 await lfBTCToken.mint(treasury.address, ETH.mul(25));
-                await mockwBTCToken.mint(ideaFund.address, ETH.mul(33));
+                await mockwBTCToken.mint(ideaFund.address, 33e8);
                 await ctrlToken.mint(treasury.address, ETH.mul(6));
 
                 const amountToStake = ETH.mul(10);
