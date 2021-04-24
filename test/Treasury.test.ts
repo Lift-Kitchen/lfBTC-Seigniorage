@@ -290,6 +290,12 @@ describe('Treasury', () => {
                 await ctrlToken.transferOperator(treasury.address);
                 await boardroom.transferOperator(treasury.address);
 
+                const wbtcPrice = await mockOracle.wbtcPriceOne();
+                let ceilingPrice = BigNumber.from(wbtcPrice).mul(105).div(100);
+
+                //peg is now more than the price seiling for wbtc
+                await mockOracle.setPrice(ceilingPrice.add(ETH));
+
                 await expect(treasury.allocateSeigniorage())
                     .to.emit(treasury, "DevFundFunded")
                     .to.emit(treasury, "IdeaFundFunded")

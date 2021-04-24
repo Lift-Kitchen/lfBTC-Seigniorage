@@ -10,7 +10,7 @@ import '../interfaces/ILinkOracle.sol'; // LINK
 contract MockOracle is IOracle {
     using SafeMath for uint256;
 
-    uint256 public price = 61400e18;
+    uint256 public price = 60000e18;
     bool public error;
 
     address factory;
@@ -64,7 +64,7 @@ contract MockOracle is IOracle {
         } else if (token == control) {
             return uint256(113000e18);
         } else if (token == wbtc) {
-            return uint256(57400e18);
+            return uint256(57800e18);
         } else if (token == hedge) {
             return uint256(500e18);
         } else {

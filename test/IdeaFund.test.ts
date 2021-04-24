@@ -432,6 +432,36 @@ describe('IdeaFund', () => {
                 await ctrlToken.connect(addr1).approve(treasury.address, ctrlPurchased);
                 await ideaFund.connect(addr1).redeemCTRL(ctrlPurchased);
             });
+
+            it('should not allow buying control with lfbtc when peg above peg price ceiling', async () => {
+                const tokenAmount = 10;
+                const amountToFund = ETH.mul(tokenAmount);
+                
+                await ideaFund.setRedemptions(treasury.address, true);
+                
+                await lfBTCToken.mint(addr1.address, amountToFund);
+                await lfBTCToken.connect(addr1).approve(ideaFund.address, amountToFund);
+
+                const pegPrice = await mockOracle.priceOf(lfBTCToken.address);
+                const ctrlPrice = await mockOracle.priceOf(ctrlToken.address);
+
+                const totalInvestment = tokenAmount * pegPrice;
+                const controlNeeded = Math.ceil(totalInvestment / ctrlPrice);
+
+                await ctrlToken.mint(ideaFund.address, ETH.mul(controlNeeded));
+                await ctrlToken.transferOperator(treasury.address);
+
+                const wbtcPrice = await mockOracle.wbtcPriceOne();
+                let ceilingPrice = BigNumber.from(wbtcPrice).mul(105).div(100);
+
+                //peg is now more than the price seiling for wbtc
+                await mockOracle.setPrice(ceilingPrice.add(ETH));
+
+                await expect(ideaFund.connect(addr1).buyCTRL(lfBTCToken.address, amountToFund))
+                    .to.be.revertedWith(
+                        "VM Exception while processing transaction: revert Idea Fund: Peg is too high to exchange right now"
+                    );
+            });
         });
     });
 });
