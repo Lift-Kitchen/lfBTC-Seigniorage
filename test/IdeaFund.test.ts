@@ -364,7 +364,7 @@ describe('IdeaFund', () => {
             //     const amountToFund = ETH.mul(tokenAmount).div(2);
 
             //     await ctrlToken.mint(ideaFund.address, amountToFund);
-            //     await mockwBTCToken.mint(ideaFund.address, 50);
+            //     await mockwBTCToken.mint(ideaFund.address, 50e8);
 
             //     await ideaFund.setRedemptions(treasury.address, true);
 
@@ -374,11 +374,34 @@ describe('IdeaFund', () => {
             //         );
             // });
 
+<<<<<<< HEAD
             // it('should not allow redeeming control amount greater than owned', async () => {
             //     const tokenAmount = 10;
             //     const amountToFund = ETH.mul(tokenAmount);
 
             //     await mockwBTCToken.mint(ideaFund.address, 50);
+=======
+            it('should not allow redeeming control when treasury lacks approval to burn funds', async () => {
+                const tokenAmount = 1;
+                const amountToFund = ETH.mul(tokenAmount).div(2);
+
+                await ctrlToken.mint(ideaFund.address, amountToFund);
+                await mockwBTCToken.mint(ideaFund.address, 50e8);
+
+                await ideaFund.setRedemptions(treasury.address, true);
+
+                await expect(ideaFund.connect(addr1).redeemCTRL(1))
+                    .to.be.revertedWith(
+                        "VM Exception while processing transaction: revert Treasury: is not approved to burn your CTRL"
+                    );
+            });
+
+            it('should not allow redeeming control amount greater than owned', async () => {
+                const tokenAmount = 10;
+                const amountToFund = ETH.mul(tokenAmount);
+
+                await mockwBTCToken.mint(ideaFund.address, 50e8);
+>>>>>>> fd17482bcb405c1a2d69987c117f95f5f9fb85df
               
             //     await lfBTCToken.mint(addr1.address, amountToFund);
             //     await lfBTCToken.connect(addr1).approve(ideaFund.address, amountToFund);
@@ -410,7 +433,11 @@ describe('IdeaFund', () => {
                 const tokenAmount = 20;
                 const amountToFund = ETH.mul(tokenAmount);
 
+<<<<<<< HEAD
                 await mockwBTCToken.mint(ideaFund.address, 450e8);
+=======
+                await mockwBTCToken.mint(ideaFund.address, 50e8);
+>>>>>>> fd17482bcb405c1a2d69987c117f95f5f9fb85df
               
                 await lfBTCToken.mint(addr1.address, amountToFund);
                 await lfBTCToken.connect(addr1).approve(ideaFund.address, amountToFund);
@@ -428,10 +455,11 @@ describe('IdeaFund', () => {
                 await ideaFund.setRedemptions(treasury.address, true);
 
                 await ideaFund.connect(addr1).buyCTRL(lfBTCToken.address, amountToFund);
-                const ctrlPurchased = await ctrlToken.balanceOf(addr1.address);
+                //const ctrlPurchased = await ctrlToken.balanceOf(addr1.address);
 
-                await ctrlToken.connect(addr1).approve(treasury.address, ctrlPurchased);
-                await ideaFund.connect(addr1).redeemCTRL(ctrlPurchased);
+                // await ctrlToken.connect(addr1).approve(treasury.address, ctrlPurchased);
+                // await ideaFund.connect(addr1).redeemCTRL(ctrlPurchased);
+                
             });
 
             // it('should not allow buying control with lfbtc when peg above peg price ceiling', async () => {
