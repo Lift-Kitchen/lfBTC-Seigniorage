@@ -187,9 +187,13 @@ contract HedgeFund is Operator, ContractGuard {
     }
 
     function hedgePrice() public view returns (uint256) {
-            uint daysSinceStart = starttime > block.timestamp ? 1 : (block.timestamp - starttime) / 60 / 60 / 24;
-            //console.log(startingValue.mul(growthRate**daysSinceStart).div(1e36));
-            return startingValue.mul((growthRate**daysSinceStart)).div(1e4**daysSinceStart);
+        uint256 accumGrowth = 10025;
+        uint daysSinceStart = starttime > block.timestamp ? 1 : (block.timestamp - starttime) / 60 / 60 / 24;
+        
+        for (uint256 i = 1; i < daysSinceStart; i++) 
+            accumGrowth = accumGrowth*growthRate/10000;
+
+        return startingValue.mul(accumGrowth).div(1e4);
     }
 
     function hedgeDaysSinceStart() public view returns (uint256) {
@@ -199,7 +203,13 @@ contract HedgeFund is Operator, ContractGuard {
     }
 
     function accumGrowth() public view returns (uint256) {
-        return (growthRate**((block.timestamp - starttime) / 60 / 60 / 24));
+        uint256 accumGrowth = 10025;
+        uint daysSinceStart = starttime > block.timestamp ? 1 : (block.timestamp - starttime) / 60 / 60 / 24;
+
+        for (uint256 i = 1; i < daysSinceStart; i++) 
+            accumGrowth = accumGrowth*growthRate/10000;
+
+        return accumGrowth;
     }
 
     // YES this 100% can rug pull the IdeaFund just like every other stablization fund via with a Migrate Function

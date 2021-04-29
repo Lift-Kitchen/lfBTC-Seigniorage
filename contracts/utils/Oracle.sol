@@ -124,6 +124,14 @@ contract Oracle {
         }
     }
 
+    function updateHedgeFund(address newHedgeFund) external onlyOperator {
+        hedgefund = newHedgeFund;
+    }
+
+    function updateIdeaFund(address newIdeaFund) external onlyOperator {
+        ideafund = newIdeaFund;
+    }
+
     function pairFor(
         address _factory,
         address _tokenA,
