@@ -46,7 +46,6 @@ import './lib/Babylonian.sol';
 import './lib/FixedPoint.sol';
 
 import './utils/Operator.sol';
-import './utils/Epoch.sol';
 import './utils/ContractGuard.sol';
 
 contract HedgeFund is Operator, ContractGuard {
