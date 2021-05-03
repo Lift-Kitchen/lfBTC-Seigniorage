@@ -21,28 +21,6 @@ async function latestBlocktime(provider: Provider): Promise<number> {
     return timestamp;
 }
 
-async function addLiquidity(
-    provider: Provider,
-    operator: SignerWithAddress,
-    router: Contract,
-    tokenA: Contract,
-    tokenB: Contract,
-    amount: BigNumber
-): Promise<void> {
-await router
-    .connect(operator)
-    .addLiquidity(
-    tokenA.address,
-    tokenB.address,
-    amount,
-    amount,
-    amount,
-    amount,
-    operator.address,
-    (await latestBlocktime(provider)) + 1800
-    );
-}
-
 describe('GenesisVault', () => {
     const { provider } = ethers;
     const startTime = 0;

@@ -237,8 +237,7 @@ describe('Treasury', () => {
             });
 
             it('should NOT expand when peg <= price ceiling', async () => {
-                const price = await mockOracle.priceOf(lfBTCToken.address);
-                mockOracle.setPrice(price);
+                mockOracle.setPrice(ETH.mul(60000));
 
                 await lfBTCToken.mint(treasury.address, ETH.mul(25));
                 await mockwBTCToken.mint(ideaFund.address, ETH.mul(33));
@@ -268,9 +267,8 @@ describe('Treasury', () => {
             });
 
             it('should allow expansion when peg > price ceiling', async () => {
-                const price = await mockOracle.priceOf(lfBTCToken.address);
-                mockOracle.setPrice(price);
-
+                mockOracle.setPrice(ETH.mul(60000));
+                
                 await lfBTCToken.mint(treasury.address, ETH.mul(25));
                 await mockwBTCToken.mint(ideaFund.address, ETH.mul(33));
                 await ctrlToken.mint(treasury.address, ETH.mul(6));
