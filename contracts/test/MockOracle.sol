@@ -78,6 +78,11 @@ contract MockOracle is IOracle {
         return uint256(57800e18);
     }
 
+    function wethPriceOne() external override pure returns (uint256 priceOfweth)
+    {
+        return uint256(2755e18);
+    }
+
     function pairFor(address _factory, address _token1, address _token2) external override view returns (address pairaddy)
     {
         return UniswapV2Library.pairFor(_factory, _token1, _token2);

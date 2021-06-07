@@ -3,8 +3,10 @@
 // Token
 // deployed first
 const MockwBTC = artifacts.require('MockwBTC');
+const MockwETH = artifacts.require('MockwETH');
 //const MockERC20 = artifacts.require('MockERC20');
-const Peg = artifacts.require('LFBTC')
+const PegBTC = artifacts.require('LFBTC')
+const PegETH = artifacts.require('LFETH')
 const Share = artifacts.require('LIFT')
 const Control = artifacts.require('CTRL')
 const Hedge = artifacts.require('HAIF')
@@ -23,11 +25,13 @@ module.exports = migration
 async function deployToken(deployer, network, accounts) {
   if (network !== 'mainnet') {
     const mockwbtc = await deployer.deploy(MockwBTC);
+    const mockweth = await deployer.deploy(MockwETH);
     //const mockerc20 = await deployer.deploy(MockERC20);
     //console.log(`MockwBTC address: ${mockwbtc.address}`);
   }
 
-  await deployer.deploy(Peg);
+  await deployer.deploy(PegBTC);
+  await deployer.deploy(PegETH);
   await deployer.deploy(Share);
   await deployer.deploy(Control);
   await deployer.deploy(Hedge);

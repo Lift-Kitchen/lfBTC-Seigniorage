@@ -36,7 +36,6 @@ contract IdeaFund is Operator, ContractGuard {
     address public treasury;
     address public theOracle;
 
-    uint256 private _haifSupply = 0;
     uint256 public variableReduction = 2;
 
     // modifier variables
@@ -73,7 +72,7 @@ contract IdeaFund is Operator, ContractGuard {
     // the second divide by 2 leaves funds in the idea fund to also stablize and invest should all owners of control decide to sell
     function getControlPrice() public view returns(uint256) {
         //calculate value   
-        return (_haifSupply.mul(IOracle(theOracle).priceOf(hedge)).div(2) + IERC20(wbtc).balanceOf(address(this)).mul(1e10).mul(IOracle(theOracle).wbtcPriceOne())).div(variableReduction).div(IERC20(control).totalSupply());
+        return (IERC20(hedge).balanceOf(address(this)).mul(IOracle(theOracle).priceOf(hedge)).div(2) + IERC20(wbtc).balanceOf(address(this)).mul(1e10).mul(IOracle(theOracle).wbtcPriceOne())).div(variableReduction).div(IERC20(control).totalSupply());
     }
 
     /* ==== CTRL BUY and SELL ====== */
@@ -137,7 +136,7 @@ contract IdeaFund is Operator, ContractGuard {
             'Idea Fund: Not enough token balance to transfer');
 
         IERC20(token).approve(hedgefund, amount);
-        _haifSupply += (uint256(IHedgeFund(hedgefund).depositToHedgeFund(token, amount))); 
+        uint256(IHedgeFund(hedgefund).depositToHedgeFund(token, amount)); 
     }
 
     //regardless of what you submit to the hedgefund, this will always return wbtc
@@ -147,7 +146,7 @@ contract IdeaFund is Operator, ContractGuard {
         );
 
         IERC20(hedge).approve(hedgefund, amount);
-        _haifSupply.sub(IHedgeFund(hedgefund).withdrawFromHedgeFund(amount));
+        IHedgeFund(hedgefund).withdrawFromHedgeFund(amount);
     }
     
     // tokenA (wbtc, lfbtc or lift) is what we are buying, with numTokens of tokenB (wbtc, lfbtc, lift)
@@ -213,7 +212,6 @@ contract IdeaFund is Operator, ContractGuard {
 
     /* ========== Operator ========== */
     function setRedemptions(address _treasury, bool isredeemable) external onlyOperator {
-        treasury = _treasury;
         _isctrlRedeemable = isredeemable;
     }
 

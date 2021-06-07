@@ -21,6 +21,7 @@ const INITIAL_CTRL = 6;
   
     const lpPoolPeg = artifacts.require('wBTClfBTCLPTokenSharePool');
     const lpPoolShare = artifacts.require('lfBTCLIFTLPTokenSharePool');
+    const lpPoolPegEth = artifacts.require('wETHlfETHLPTokenSharePool');
   
     await deployer.deploy(
       InitialShareDistributor,
@@ -35,10 +36,13 @@ const INITIAL_CTRL = 6;
     await share.mint(distributor.address, totalBalance.toString());
     console.log(`Deposited ${INITIAL_LIFT_FOR_WBTC_LFBTC} + ${INITIAL_LIFT_FOR_LFBTC_LIFT} LIFT to InitialShareDistributor.`);
   
+    await share.mint(lpPoolPegEth.address, INITIAL_LIFT_FOR_WBTC_LFBTC);
+
     console.log(`Setting distributor to InitialShareDistributor (${distributor.address})`);
     await lpPoolPeg.deployed().then(pool => pool.setRewardDistribution(distributor.address));
     await lpPoolShare.deployed().then(pool => pool.setRewardDistribution(distributor.address));
-  
+    //await lpPoolPegEth.deployed().then(pool => pool.notifyRewardAmount(INITIAL_LIFT_FOR_WBTC_LFBTC));
+    
     await distributor.distribute();
 
     await control.mint(accounts[0], unit.muln(INITIAL_CTRL));

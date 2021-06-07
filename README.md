@@ -1,28 +1,27 @@
 # LiftDAO aka Lift.kitchen
-truffle run verify MockwBTC GenesisVault IdeaFund HedgeFund Treasury Boardroom  wBTClfBTCLPTokenSharePool lfBTCLIFTLPTokenSharePool Oracle lfBTC LIFT CTRL HAIF DevFund --network rinkeby
-
-Verifying GenesisVault 
-https://etherscan.io/address/0x2114E25d458BF42deb21432BcCC01f2d88a1dC7C#contracts
+WBTC - 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599
 Verifying IdeaFund
 https://etherscan.io/address/0x918b4FDbC30B628564E07fd2120009b0078F4343#contracts
-Verifying old HedgeFund
-https://etherscan.io/address/0x8974c4f6F66AeE757515c0a745A8C4702B3aEedc#contracts
-Verifying old Oracle
-https://etherscan.io/address/0x30216adbbF2958a73C5930721Fd96Fec3030EdeB#contracts
+Verifying IdeaFund – New 6/6
+https://etherscan.io/address/0x0598B812F79df854409641bce01392FeA921f11E#contracts
 Verifying new HedgeFund
 https://etherscan.io/address/0xF3fA224dfF32DAFc9332803e880aB250AB6B0A68#contracts
-Verifying new Oracle
-https://etherscan.io/address/0x19631167bf0FE463fE52173f6ce0ceA9C3c08641#contracts
-Verifying Treasury
-https://etherscan.io/address/0x0F756a496813455dEcf2B8992a716039A5df64F1#contracts
 Verifying Boardroom
 https://etherscan.io/address/0x3223689b39Db8a897a9A9F0907C8a75d42268787#contracts
 Verifying wBTClfBTCLPTokenSharePool
 https://etherscan.io/address/0x4DB2fa451e1051A013A42FaD98b04C2aB81043Af#contracts
 Verifying lfBTCLIFTLPTokenSharePool
 https://etherscan.io/address/0xC3C79869ED93c88E1227a1Ca3542c9B947BA9e0c#contracts
-Verifying lfBTC
+Verifying wETHlfETHLPTokenSharePool
+https://etherscan.io/address/0xBd2B271150332628fEd8269217b88cC7A31283E4#contracts
+Verifying New Treasury – 6/1
+https://etherscan.io/address/0x5dc17A9FA19e4c0aFF2df59b0878a0d0ff78Ba3D#contracts
+Verifying New Oracle – 6/1
+https://etherscan.io/address/0x126aE6EF73C8CDA33a08B4F8C3410D02089A1AAf#contracts
+Verifying lfBTC - 0xafcE9B78D409bF74980CACF610AFB851BF02F257
 https://etherscan.io/address/0xafcE9B78D409bF74980CACF610AFB851BF02F257#contracts
+Verifying lfETH
+https://etherscan.io/token/0xE09B10EFA59F6E17052E9A2D947bAd6214E7CC90#readContract
 Verifying LIFT
 https://etherscan.io/address/0xf9209d900f7ad1DC45376a2caA61c78f6dEA53B6#contracts
 Verifying CTRL
@@ -41,9 +40,20 @@ Verifying shortStakeKBTCPool
 https://etherscan.io/address/0xe2Cf4ab503276BC693fB05eb2Da00c997E26ee68#contracts
 Verifying shortStakePICKLEPool
 https://etherscan.io/address/0x570CcB67cD8511f959e8842c5F78d62CeD873DF3#contracts
+Verifying old HedgeFund
+https://etherscan.io/address/0x8974c4f6F66AeE757515c0a745A8C4702B3aEedc#contracts
+Verifying old Oracle
+https://etherscan.io/address/0x30216adbbF2958a73C5930721Fd96Fec3030EdeB#contracts
+Verifying new Oracle
+https://etherscan.io/address/0x19631167bf0FE463fE52173f6ce0ceA9C3c08641#contracts
+Verifying Treasury
+https://etherscan.io/address/0x0F756a496813455dEcf2B8992a716039A5df64F1#contracts
+Verifying GenesisVault 
+https://etherscan.io/address/0x2114E25d458BF42deb21432BcCC01f2d88a1dC7C#contracts
 
 
 
+truffle run verify MockwBTC GenesisVault IdeaFund HedgeFund Treasury Boardroom  wBTClfBTCLPTokenSharePool lfBTCLIFTLPTokenSharePool Oracle lfBTC LIFT CTRL HAIF DevFund --network rinkeby
 
 Genesis Steps
 --------------------------------------------------------------------------------------

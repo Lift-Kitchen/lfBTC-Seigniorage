@@ -27,8 +27,10 @@ contract Oracle is Operator {
     /* ========== STATE VARIABLES ========== */
 
     // uniswap
-    address public staking; // wbtc
-    address public peg; // lfbtc
+    address public stakingbtc; // wbtc
+    address public stakingeth; // weth
+    address public pegbtc; // lfbtc
+    address public pegeth; // lfeth
     address public share; // lift
     address public control; // ctrl
     address public hedge; // haif
@@ -36,48 +38,65 @@ contract Oracle is Operator {
     address public ideafund; // idea fund
     address public factory;
 
-    IUniswapV2Pair public pairStakingtoPeg;
-    IUniswapV2Pair public pairPegtoShare;
-    ILinkOracle public linkOracle;
+    IUniswapV2Pair public pairStakingBTCtoPegbtc;
+    IUniswapV2Pair public pairStakingETHtoPegeth;
+    IUniswapV2Pair public pairPegbtctoShare;
+    ILinkOracle public linkBTCOracle;
+    ILinkOracle public linkETHOracle;
+
 
     /* ========== CONSTRUCTOR ========== */
 
     constructor(
         address _factory,
-        address _staking, //wbtc
-        address _peg, // lfbtc
+        address _stakingbtc, //wbtcPriceOne
+        address _stakingeth, //wethPriceOne
+        address _pegbtc, // lfbtc
+        address _pegeth, // lfeth
         address _share, // lift
         address _control, // ctrl
         address _hedge, // haif
         address _hedgefund,
         address _ideafund,
-        ILinkOracle _linkOracle
+        ILinkOracle _linkOracleBTC,
+        ILinkOracle _linkOracleETH
     ) {
 
         hedgefund = _hedgefund;
         ideafund = _ideafund;
         hedge = _hedge;
         control = _control;
-        linkOracle = _linkOracle;
+        linkBTCOracle = _linkOracleBTC;
+        linkETHOracle = _linkOracleETH;
 
-        peg = _peg;
+        pegbtc = _pegbtc;
+        pegeth = _pegeth;
         share = _share;
-        staking = _staking;
+        stakingbtc = _stakingbtc;
+        stakingeth = _stakingeth;
         factory = _factory;
 
-        pairStakingtoPeg = IUniswapV2Pair(
-            UniswapV2Library.pairFor(factory, staking, peg)
+        pairStakingBTCtoPegbtc = IUniswapV2Pair(
+            UniswapV2Library.pairFor(factory, stakingbtc, pegbtc)
+        );
+
+        pairStakingETHtoPegeth = IUniswapV2Pair(
+            UniswapV2Library.pairFor(factory, stakingeth, pegeth)  
         );
        
-        pairPegtoShare = IUniswapV2Pair(
-            UniswapV2Library.pairFor(factory, peg, share)
+        pairPegbtctoShare = IUniswapV2Pair(
+            UniswapV2Library.pairFor(factory, pegbtc, share)
         );
     }
 
     /* ========== MUTABLE FUNCTIONS ========== */
 
     function wbtcPriceOne() external view returns(uint256) {
-        return uint256(linkOracle.latestAnswer() * 1e10);
+        return uint256(linkBTCOracle.latestAnswer() * 1e10);
+    }
+
+    function wethPriceOne() external view returns(uint256) {
+        return uint256(linkETHOracle.latestAnswer() * 1e10);
     }
 
     function priceOf(address token) external view returns (uint256 price) {
@@ -85,16 +104,20 @@ contract Oracle is Operator {
     }
 
     function _priceOf(address token) internal view returns (uint256 price) {
-         if (token == peg) {
-            return priceFromPair(pairStakingtoPeg);
+        if (token == pegbtc) {
+            return priceFromPair(pairStakingBTCtoPegbtc);
+        } else if (token == pegeth) {
+            return priceFromPair(pairStakingETHtoPegeth);
         } else if (token == share) {
-            return priceFromPair(pairPegtoShare);
+            return priceFromPair(pairPegbtctoShare);
         } else if (token == control) {
             return IIdeaFund(ideafund).getControlPrice();
         } else if(token == hedge) {
             return IHedgeFund(hedgefund).hedgePrice();
-        } else if(token == staking) {
-            return uint256(linkOracle.latestAnswer() * 1e10);
+        } else if(token == stakingbtc) {
+            return uint256(linkBTCOracle.latestAnswer() * 1e10);
+        } else if (token == stakingeth) {
+            return uint256(linkETHOracle.latestAnswer() * 1e10);
         }
     }
 
@@ -105,21 +128,28 @@ contract Oracle is Operator {
 
         (token0Supply, token1Supply, ) = pair.getReserves();
 
-        if (pair.token0() == staking) {
+        if (pair.token0() == stakingbtc) {
             token0Supply = token0Supply.mul(1e18);
                      
             return token0Supply.div(token1Supply).mul(_priceOf(pair.token0())).div(1e8);
-        } else if (pair.token1() == staking) {
+        } else if (pair.token1() == stakingbtc) {
             token1Supply = token1Supply.mul(1e18);
 
             return token1Supply.div(token0Supply).mul(_priceOf(pair.token1())).div(1e8);
+        } else if (pair.token0() == stakingeth) {
+            token0Supply = token0Supply.mul(1e8);
 
-        } else if (pair.token0() == peg) {
+            return token0Supply.div(token1Supply).mul(_priceOf(pair.token0())).div(1e8);
+        }else if (pair.token1() == stakingeth) {
+            token1Supply = token1Supply.mul(1e18);
+
+            return token1Supply.div(token0Supply).mul(_priceOf(pair.token1())).div(1e8);
+        }else if (pair.token0() == pegbtc) {
             token0Supply = token0Supply.mul(1e8);
 
             return token0Supply.div(token1Supply).mul(_priceOf(pair.token0())).div(1e8);
 
-        } else if (pair.token1() == peg) {                    
+        } else if (pair.token1() == pegbtc) {                    
             token1Supply = token1Supply.mul(1e8);
 
             return token1Supply.div(token0Supply).mul(_priceOf(pair.token1())).div(1e8);
