@@ -1,7 +1,5 @@
 # LiftDAO aka Lift.kitchen
 WBTC - 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599
-Verifying IdeaFund
-https://etherscan.io/address/0x918b4FDbC30B628564E07fd2120009b0078F4343#contracts
 Verifying IdeaFund – New 6/6
 https://etherscan.io/address/0x0598B812F79df854409641bce01392FeA921f11E#contracts
 Verifying new HedgeFund
@@ -44,7 +42,9 @@ Verifying old HedgeFund
 https://etherscan.io/address/0x8974c4f6F66AeE757515c0a745A8C4702B3aEedc#contracts
 Verifying old Oracle
 https://etherscan.io/address/0x30216adbbF2958a73C5930721Fd96Fec3030EdeB#contracts
-Verifying new Oracle
+Verifying Old IdeaFund
+https://etherscan.io/address/0x918b4FDbC30B628564E07fd2120009b0078F4343#contracts
+Verifying 2nd Oracle
 https://etherscan.io/address/0x19631167bf0FE463fE52173f6ce0ceA9C3c08641#contracts
 Verifying Treasury
 https://etherscan.io/address/0x0F756a496813455dEcf2B8992a716039A5df64F1#contracts
