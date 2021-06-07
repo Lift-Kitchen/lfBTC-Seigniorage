@@ -26,6 +26,7 @@ describe('IdeaFund', () => {
     const { provider } = ethers;
     const period = 0;
     const startTime = 1618018953;
+    const initialLiquidity = ETH.mul(100);
 
     let lfBTCTokenFactory: ContractFactory;
     let liftTokenFactory: ContractFactory;
@@ -192,6 +193,30 @@ describe('IdeaFund', () => {
         );
 
         ideaFund.updateAddresses(treasury.address, hedgeFund.address);
+
+        await mockwBTCToken.mint(operator.address, initialLiquidity);
+        await mockwBTCToken.connect(operator).approve(uniswapRouter.address, initialLiquidity);
+
+        await lfBTCToken.mint(operator.address, initialLiquidity.mul(1e10));
+        await lfBTCToken.connect(operator).approve(uniswapRouter.address, initialLiquidity.mul(1e10));
+
+        await uniswapFactory.createPair(
+            mockwBTCToken.address,
+            lfBTCToken.address
+        );
+        
+        await uniswapRouter
+            .connect(operator)
+            .addLiquidity(
+                mockwBTCToken.address,
+                lfBTCToken.address,
+                initialLiquidity,
+                initialLiquidity.mul(1e10),
+                0,
+                0,
+                operator.address,
+                1e10
+            );
     });
 
     describe('Deployment', async () => {
@@ -242,19 +267,16 @@ describe('IdeaFund', () => {
             it('should allow buying control with lfbtc', async () => {
                 const tokenAmount = 10;
                 const amountToFund = ETH.mul(tokenAmount);
+                const amountToAllocate = ETH.mul(tokenAmount);
+
+                await mockwBTCToken.mint(ideaFund.address, amountToAllocate);
                 
                 await ideaFund.setRedemptions(treasury.address, true);
                 
                 await lfBTCToken.mint(addr1.address, amountToFund);
                 await lfBTCToken.connect(addr1).approve(ideaFund.address, amountToFund);
 
-                const pegPrice = await mockOracle.priceOf(lfBTCToken.address);
-                const ctrlPrice = await mockOracle.priceOf(ctrlToken.address);
-
-                const totalInvestment = tokenAmount * pegPrice;
-                const controlNeeded = Math.ceil(totalInvestment / ctrlPrice);
-
-                await ctrlToken.mint(ideaFund.address, ETH.mul(controlNeeded));
+                await ctrlToken.mint(ideaFund.address, ETH.mul(6));
                 await ctrlToken.transferOperator(treasury.address);
 
                 await expect(ideaFund.connect(addr1).buyCTRL(lfBTCToken.address, amountToFund))
@@ -264,19 +286,16 @@ describe('IdeaFund', () => {
             it('should allow buying control with lift', async () => {
                 const tokenAmount = 10;
                 const amountToFund = ETH.mul(tokenAmount);
+                const amountToAllocate = ETH.mul(tokenAmount);
                 
+                await mockwBTCToken.mint(ideaFund.address, amountToAllocate);
+
                 await ideaFund.setRedemptions(treasury.address, true);
                 
                 await liftToken.mint(addr1.address, amountToFund);
                 await liftToken.connect(addr1).approve(ideaFund.address, amountToFund);
 
-                const sharePrice = await mockOracle.priceOf(liftToken.address);
-                const ctrlPrice = await mockOracle.priceOf(ctrlToken.address);
-
-                const totalInvestment = tokenAmount * sharePrice;
-                const controlNeeded = Math.ceil(totalInvestment / ctrlPrice);
-
-                await ctrlToken.mint(ideaFund.address, ETH.mul(controlNeeded));
+                await ctrlToken.mint(ideaFund.address, ETH.mul(6));
                 await ctrlToken.transferOperator(treasury.address);
 
                 await expect(ideaFund.connect(addr1).buyCTRL(liftToken.address, amountToFund))
@@ -337,13 +356,7 @@ describe('IdeaFund', () => {
                 await lfBTCToken.mint(addr1.address, amountToFund);
                 await lfBTCToken.connect(addr1).approve(ideaFund.address, amountToFund);
 
-                const pegPrice = await mockOracle.priceOf(lfBTCToken.address);
-                const ctrlPrice = await mockOracle.priceOf(ctrlToken.address);
-
-                const totalInvestment = tokenAmount * pegPrice;
-                const controlNeeded = Math.ceil(totalInvestment / ctrlPrice);
-
-                await ctrlToken.mint(ideaFund.address, ETH.mul(controlNeeded));
+                await ctrlToken.mint(ideaFund.address, ETH.mul(6));
                 await ctrlToken.transferOperator(treasury.address);
 
                 await ideaFund.setRedemptions(treasury.address, true);
@@ -369,13 +382,7 @@ describe('IdeaFund', () => {
                 await lfBTCToken.mint(addr1.address, amountToFund);
                 await lfBTCToken.connect(addr1).approve(ideaFund.address, amountToFund);
 
-                const pegPrice = await mockOracle.priceOf(lfBTCToken.address);
-                const ctrlPrice = await mockOracle.priceOf(ctrlToken.address);
-
-                const totalInvestment = tokenAmount * pegPrice;
-                const controlNeeded = Math.ceil(totalInvestment / ctrlPrice);
-
-                await ctrlToken.mint(ideaFund.address, ETH.mul(controlNeeded));
+                await ctrlToken.mint(ideaFund.address, ETH.mul(6));
                 await ctrlToken.transferOperator(treasury.address);
 
                 await ideaFund.setRedemptions(treasury.address, true);
@@ -390,20 +397,16 @@ describe('IdeaFund', () => {
             it('should not allow buying control with lfbtc when peg above peg price ceiling', async () => {
                 const tokenAmount = 10;
                 const amountToFund = ETH.mul(tokenAmount);
-                
-                await ideaFund.setRedemptions(treasury.address, true);
-                
+
+                await mockwBTCToken.mint(ideaFund.address, 50e8);
+              
                 await lfBTCToken.mint(addr1.address, amountToFund);
                 await lfBTCToken.connect(addr1).approve(ideaFund.address, amountToFund);
 
-                const pegPrice = await mockOracle.priceOf(lfBTCToken.address);
-                const ctrlPrice = await mockOracle.priceOf(ctrlToken.address);
-
-                const totalInvestment = tokenAmount * pegPrice;
-                const controlNeeded = Math.ceil(totalInvestment / ctrlPrice);
-
-                await ctrlToken.mint(ideaFund.address, ETH.mul(controlNeeded));
+                await ctrlToken.mint(ideaFund.address, ETH.mul(6));
                 await ctrlToken.transferOperator(treasury.address);
+
+                await ideaFund.setRedemptions(treasury.address, true);
 
                 const wbtcPrice = await mockOracle.wbtcPriceOne();
                 let ceilingPrice = BigNumber.from(wbtcPrice).mul(105).div(100);

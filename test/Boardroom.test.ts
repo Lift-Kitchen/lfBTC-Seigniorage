@@ -134,6 +134,8 @@ describe('Boardroom', () => {
             mockLinkOracle.address
         );
 
+        await ideaFund.updateOracle(mockOracle.address);
+
         boardroom = await boardroomFactory.deploy(
             liftToken.address,
             ctrlToken.address,
@@ -347,6 +349,8 @@ describe('Boardroom', () => {
                 const amountToStake = ETH.mul(10);
                 const amountToAllocate = ETH;
 
+                await mockwBTCToken.mint(ideaFund.address, amountToAllocate);
+
                 await ctrlToken.mint(addr1.address, amountToStake.mul(2));
 
                 await ctrlToken.connect(addr1).approve(boardroom.address, amountToStake);
@@ -364,6 +368,8 @@ describe('Boardroom', () => {
             it('should allocate Seigniorage', async () => {
                 const amountToStake = ETH.mul(10);
                 const amountToAllocate = ETH;
+
+                await mockwBTCToken.mint(ideaFund.address, amountToAllocate);
 
                 await ctrlToken.mint(addr1.address, amountToStake.mul(2));
 
@@ -384,6 +390,8 @@ describe('Boardroom', () => {
 
                 const amountToStake = ETH.mul(10);
                 const amountToAllocate = ETH;
+
+                await mockwBTCToken.mint(ideaFund.address, amountToAllocate);
 
                 await liftToken.mint(addr1.address, amountToStake.mul(2));
 
@@ -406,6 +414,8 @@ describe('Boardroom', () => {
 
                 const amountToStake = ETH.mul(10);
                 const amountToAllocate = ETH;
+
+                await mockwBTCToken.mint(ideaFund.address, amountToAllocate);
 
                 await ctrlToken.mint(addr1.address, amountToStake.mul(2));
 
@@ -435,6 +445,8 @@ describe('Boardroom', () => {
                 const amountToStake = ETH.mul(10);
                 const amountToAllocate = ETH;
 
+                await mockwBTCToken.mint(ideaFund.address, amountToAllocate);
+
                 await liftToken.mint(addr1.address, amountToStake.mul(2));
 
                 await liftToken.connect(addr1).approve(boardroom.address, amountToStake);
@@ -461,6 +473,8 @@ describe('Boardroom', () => {
 
                 const amountToStake = ETH.mul(10);
                 const amountToAllocate = ETH.mul(3);
+
+                await mockwBTCToken.mint(ideaFund.address, amountToAllocate);
 
                 await liftToken.mint(addr1.address, amountToStake.mul(4000));
                 await ctrlToken.mint(addr1.address, amountToStake.mul(1));
